@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -15,6 +16,33 @@ import type {
 } from "@/lib/supabase/types";
 import { CORE_ELEMENTS } from "@/lib/supabase/types";
 import { PrintButton } from "./print-button";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+
+  const { data: incident } = await supabase
+    .from("incidents")
+    .select("facility_org_id, name")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (!incident) return {};
+
+  const [{ data: aar }, { data: org }] = await Promise.all([
+    supabase.from("aar").select("event_name").eq("incident_id", id).maybeSingle(),
+    supabase.from("organizations").select("name").eq("id", incident.facility_org_id).maybeSingle(),
+  ]);
+
+  const eventName = aar?.event_name ?? incident.name;
+  const title = org?.name ? `${org.name} — ${eventName} AAR` : `${eventName} AAR`;
+
+  return { title };
+}
 
 export default async function AarReportPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
