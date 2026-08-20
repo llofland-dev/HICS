@@ -317,6 +317,32 @@ export interface Ics201Resource {
   created_at: string;
 }
 
+export interface Ics215aAnalysis {
+  operational_period_id: string;
+  prepared_by_name: string | null;
+  prepared_by_signature: string | null;
+  prepared_at: string | null;
+  prepared_by_facility: string | null;
+  approved_by_name: string | null;
+  approved_by_signature: string | null;
+  approved_at: string | null;
+  approved_by_facility: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Ics215aHazard {
+  id: string;
+  operational_period_id: string;
+  hazard: string;
+  affected_area: string | null;
+  mitigation: string | null;
+  completed: boolean;
+  completed_note: string | null;
+  sort_order: number;
+  created_at: string;
+}
+
 export interface Assignment {
   id: string;
   incident_id: string;

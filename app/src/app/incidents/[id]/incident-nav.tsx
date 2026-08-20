@@ -12,6 +12,7 @@ function sections(incidentId: string) {
     { href: `/incidents/${incidentId}/communications`, label: "HICS 205A" },
     { href: `/incidents/${incidentId}/messages`, label: "HICS 213" },
     { href: `/incidents/${incidentId}/unit-logs`, label: "HICS 214" },
+    { href: `/incidents/${incidentId}/ics215a`, label: "HICS 215A" },
     { href: `/incidents/${incidentId}/aar`, label: "AAR" },
   ];
 }
