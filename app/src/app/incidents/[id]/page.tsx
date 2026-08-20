@@ -114,6 +114,12 @@ export default async function IncidentPage({
           </div>
           <div className="flex items-center gap-4">
             <Link
+              href={`/incidents/${incident.id}/ics203`}
+              className="text-sm text-zinc-500 hover:underline"
+            >
+              Org assignment list (203)
+            </Link>
+            <Link
               href={`/incidents/${incident.id}/aar`}
               className="text-sm text-zinc-500 hover:underline"
             >

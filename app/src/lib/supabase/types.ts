@@ -205,6 +205,38 @@ export interface AarCoordinationRole {
   created_at: string;
 }
 
+export interface Ics203Details {
+  operational_period_id: string;
+  agency_executive_name: string | null;
+  agency_executive_contact: string | null;
+  prepared_by_name: string | null;
+  prepared_by_signature: string | null;
+  prepared_at: string | null;
+  prepared_by_facility: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Ics203ExternalRep {
+  id: string;
+  operational_period_id: string;
+  agency_name: string;
+  representative_name: string | null;
+  contact_info: string | null;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface Ics203HospitalRep {
+  id: string;
+  operational_period_id: string;
+  name: string;
+  role: string | null;
+  location: string | null;
+  sort_order: number;
+  created_at: string;
+}
+
 export interface Assignment {
   id: string;
   incident_id: string;
