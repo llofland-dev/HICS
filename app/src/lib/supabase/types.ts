@@ -237,6 +237,43 @@ export interface Ics203HospitalRep {
   created_at: string;
 }
 
+export interface Ics204AssignmentList {
+  id: string;
+  operational_period_id: string;
+  section: PositionSection;
+  section_chief_name: string | null;
+  branch: string | null;
+  branch_director_name: string | null;
+  special_info: string | null;
+  prepared_by_name: string | null;
+  prepared_by_signature: string | null;
+  prepared_at: string | null;
+  prepared_by_facility: string | null;
+  created_at: string;
+}
+
+export interface Ics204Objective {
+  id: string;
+  assignment_list_id: string;
+  objective: string;
+  strategies_tactics: string | null;
+  resources_required: string | null;
+  unit_assigned_to: string | null;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface Ics204Unit {
+  id: string;
+  assignment_list_id: string;
+  unit_name: string;
+  leader_name: string | null;
+  location: string | null;
+  members_teams: string | null;
+  sort_order: number;
+  created_at: string;
+}
+
 export interface Assignment {
   id: string;
   incident_id: string;
