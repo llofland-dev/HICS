@@ -73,7 +73,7 @@ export default async function IncidentPage({
     ]);
 
   const selectedPeriod =
-    (op && periods?.find((p) => p.id === op)) ??
+    (op ? periods?.find((p) => p.id === op) : undefined) ??
     periods?.find((p) => p.status === "active") ??
     periods?.[periods.length - 1] ??
     null;
