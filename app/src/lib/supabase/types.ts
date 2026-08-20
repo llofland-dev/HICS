@@ -68,6 +68,31 @@ export interface StaffQualification {
   qualified: boolean;
 }
 
+export interface Message {
+  id: string;
+  incident_id: string;
+  event_id: string | null;
+  incident_name: string | null;
+  to_name: string | null;
+  to_position_code: string | null;
+  from_name: string | null;
+  from_position_code: string | null;
+  subject: string | null;
+  sent_date: string | null;
+  sent_time: string | null;
+  body: string | null;
+  approved_by_name: string | null;
+  approved_by_signature: string | null;
+  approved_by_position: string | null;
+  reply_body: string | null;
+  replied_by_name: string | null;
+  replied_by_position: string | null;
+  reply_date: string | null;
+  reply_time: string | null;
+  created_at: string;
+  created_by: string | null;
+}
+
 export interface Assignment {
   id: string;
   incident_id: string;

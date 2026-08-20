@@ -86,12 +86,20 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
               {!canEdit && " · read-only (different facility)"}
             </p>
           </div>
-          <Link
-            href={`/incidents/${incident.id}/communications`}
-            className="text-sm text-zinc-500 hover:underline"
-          >
-            Communications list (205A)
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href={`/incidents/${incident.id}/messages`}
+              className="text-sm text-zinc-500 hover:underline"
+            >
+              General messages (213)
+            </Link>
+            <Link
+              href={`/incidents/${incident.id}/communications`}
+              className="text-sm text-zinc-500 hover:underline"
+            >
+              Communications list (205A)
+            </Link>
+          </div>
         </div>
       </header>
 
