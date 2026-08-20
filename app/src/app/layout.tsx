@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HICS Incident Tracker",
-  description: "Multi-facility HICS incident activation tracker",
+  title: "MEDICS",
+  description: "Managed Emergency Decisions Incident Command System",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

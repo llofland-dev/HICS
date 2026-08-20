@@ -50,9 +50,7 @@ export default async function Home() {
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
       <header className="flex items-center justify-between border-b border-black/10 px-6 py-4 dark:border-white/10">
         <div>
-          <h1 className="text-lg font-semibold text-black dark:text-zinc-50">
-            HICS Incident Tracker
-          </h1>
+          <h1 className="text-lg font-semibold text-black dark:text-zinc-50">MEDICS</h1>
           <p className="text-sm text-zinc-500">
             {fullName || user.email} · {org ? org.name : "No facility assigned"}
           </p>

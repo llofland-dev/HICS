@@ -62,7 +62,7 @@ export default function SignUpPage() {
       >
         <div>
           <h1 className="text-xl font-semibold text-black dark:text-zinc-50">Create account</h1>
-          <p className="text-sm text-zinc-500">HICS Incident Tracker</p>
+          <p className="text-sm text-zinc-500">MEDICS</p>
         </div>
 
         <div className="flex gap-3">

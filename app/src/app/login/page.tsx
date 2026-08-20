@@ -38,9 +38,10 @@ export default function LoginPage() {
         onSubmit={handleSubmit}
         className="w-full max-w-sm space-y-4 rounded-lg border border-black/10 bg-white p-8 dark:border-white/10 dark:bg-zinc-950"
       >
-        <h1 className="text-xl font-semibold text-black dark:text-zinc-50">
-          HICS Incident Tracker
-        </h1>
+        <div>
+          <h1 className="text-xl font-semibold text-black dark:text-zinc-50">MEDICS</h1>
+          <p className="text-sm text-zinc-500">Managed Emergency Decisions Incident Command System</p>
+        </div>
 
         <div className="space-y-1">
           <label htmlFor="email" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">

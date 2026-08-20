@@ -1,7 +1,8 @@
-# HICS Incident Tracker
+# MEDICS
 
-Next.js (App Router) + Supabase frontend for the multi-facility HICS incident
-tracker. Schema and RLS policies live in `../supabase/migrations`.
+Managed Emergency Decisions Incident Command System — a Next.js (App Router)
++ Supabase frontend for the multi-facility HICS incident tracker. Schema and
+RLS policies live in `../supabase/migrations`.
 
 ## Setup
 
