@@ -57,7 +57,14 @@ export default async function Home() {
             {fullName || user.email} · {org ? org.name : "No facility assigned"}
           </p>
         </div>
-        <SignOutButton />
+        <div className="flex items-center gap-4">
+          {org && (
+            <Link href="/staff" className="text-sm text-zinc-500 hover:underline">
+              Staff roster
+            </Link>
+          )}
+          <SignOutButton />
+        </div>
       </header>
 
       <main className="mx-auto max-w-4xl px-6 py-8">

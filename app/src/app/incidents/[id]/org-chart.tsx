@@ -12,7 +12,7 @@ import type {
   StaffQualification,
 } from "@/lib/supabase/types";
 
-const SECTION_COLORS: Record<PositionSection, { border: string; badge: string }> = {
+export const SECTION_COLORS: Record<PositionSection, { border: string; badge: string }> = {
   Command: {
     border: "border-violet-400 dark:border-violet-600",
     badge: "bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200",
