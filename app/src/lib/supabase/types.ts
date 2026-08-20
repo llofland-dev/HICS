@@ -93,6 +93,41 @@ export interface Message {
   created_by: string | null;
 }
 
+export interface UnitLog {
+  id: string;
+  incident_id: string;
+  unit_name: string;
+  position_code: string | null;
+  leader_name: string | null;
+  home_agency: string | null;
+  op_period_date_from: string | null;
+  op_period_date_to: string | null;
+  op_period_time_from: string | null;
+  op_period_time_to: string | null;
+  prepared_by_name: string | null;
+  prepared_by_position: string | null;
+  prepared_by_signature: string | null;
+  prepared_at: string | null;
+  created_at: string;
+}
+
+export interface UnitLogResource {
+  id: string;
+  unit_log_id: string;
+  name: string;
+  ics_position: string | null;
+  home_agency: string | null;
+}
+
+export interface UnitLogEntry {
+  id: string;
+  unit_log_id: string;
+  entry_date: string;
+  entry_time: string;
+  notable_activity: string;
+  created_at: string;
+}
+
 export interface Assignment {
   id: string;
   incident_id: string;

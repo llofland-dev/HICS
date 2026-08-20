@@ -88,6 +88,12 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
           </div>
           <div className="flex items-center gap-4">
             <Link
+              href={`/incidents/${incident.id}/unit-logs`}
+              className="text-sm text-zinc-500 hover:underline"
+            >
+              Unit logs (214)
+            </Link>
+            <Link
               href={`/incidents/${incident.id}/messages`}
               className="text-sm text-zinc-500 hover:underline"
             >
