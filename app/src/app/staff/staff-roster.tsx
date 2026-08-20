@@ -4,7 +4,7 @@ import { Fragment, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Position, PositionSection, Staff, StaffQualification } from "@/lib/supabase/types";
-import { SECTION_COLORS } from "../incidents/[id]/org-chart";
+import { SECTION_COLORS } from "@/lib/section-colors";
 
 interface StaffRosterProps {
   facilityOrgId: string;

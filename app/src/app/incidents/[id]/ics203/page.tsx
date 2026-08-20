@@ -14,7 +14,7 @@ import type {
   Profile,
   Staff,
 } from "@/lib/supabase/types";
-import { SECTION_COLORS } from "../org-chart";
+import { SECTION_COLORS } from "@/lib/section-colors";
 import { Ics203Editor } from "./ics203-editor";
 import { PrintButton } from "./print-button";
 
