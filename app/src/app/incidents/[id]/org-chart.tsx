@@ -213,9 +213,13 @@ export function OrgChart({
     const isUnqualified =
       current && !qualifiedSet.has(`${current.staff_id}:${node.code}`);
 
+    const visibleChildren = node.children.filter(
+      (child) => child.tier !== "expansion" || showExpansion
+    );
+
     return (
-      <div className="flex flex-col items-start">
-        <div className={`w-52 rounded-md border-2 bg-white p-2 dark:bg-zinc-950 ${colors.border}`}>
+      <div className="flex flex-col items-center">
+        <div className={`w-52 shrink-0 rounded-md border-2 bg-white p-2 dark:bg-zinc-950 ${colors.border}`}>
           <div className="flex items-center justify-between gap-1">
             <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${colors.badge}`}>
               {node.section}
@@ -241,12 +245,31 @@ export function OrgChart({
           )}
         </div>
 
-        {node.children.length > 0 && (
-          <div className="ml-4 mt-2 space-y-2 border-l-2 border-black/10 pl-4 dark:border-white/10">
-            {node.children.map((child) => (
-              <PositionCard key={child.code} node={child} />
-            ))}
-          </div>
+        {visibleChildren.length > 0 && (
+          <>
+            {/* stub connecting this box down to the children's shared rail */}
+            <div className="h-4 w-px bg-black/15 dark:bg-white/15" />
+
+            <div className="flex">
+              {visibleChildren.map((child, i) => (
+                <div key={child.code} className="flex flex-col items-center px-3">
+                  {/* rail segment: full width for interior children, half width
+                      (toward center) for the first/last so the line only spans
+                      from the first child's center to the last child's center */}
+                  <div className="relative h-px w-full bg-black/15 dark:bg-white/15">
+                    {i === 0 && (
+                      <div className="absolute inset-y-0 left-0 w-1/2 bg-zinc-50 dark:bg-black" />
+                    )}
+                    {i === visibleChildren.length - 1 && (
+                      <div className="absolute inset-y-0 right-0 w-1/2 bg-zinc-50 dark:bg-black" />
+                    )}
+                  </div>
+                  <div className="h-4 w-px bg-black/15 dark:bg-white/15" />
+                  <PositionCard node={child} />
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     );
