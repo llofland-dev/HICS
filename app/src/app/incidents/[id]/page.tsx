@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type {
@@ -99,92 +98,31 @@ export default async function IncidentPage({
     : { data: [] as StaffQualification[] };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black">
-      <header className="border-b border-black/10 px-6 py-4 dark:border-white/10">
-        <Link href="/" className="text-sm text-zinc-500 hover:underline">
-          ← Incidents
-        </Link>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-semibold text-black dark:text-zinc-50">{incident.name}</h1>
-            <p className="text-sm text-zinc-500">
-              {incident.incident_date} · {incident.type} · {incident.status}
-              {!canEdit && " · read-only (different facility)"}
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link
-              href={`/incidents/${incident.id}/ics201`}
-              className="text-sm text-zinc-500 hover:underline"
-            >
-              HICS 201 Incident Briefing
-            </Link>
-            <Link
-              href={`/incidents/${incident.id}/ics204`}
-              className="text-sm text-zinc-500 hover:underline"
-            >
-              Assignment lists (204)
-            </Link>
-            <Link
-              href={`/incidents/${incident.id}/ics203`}
-              className="text-sm text-zinc-500 hover:underline"
-            >
-HICS 203 Organization List
-            </Link>
-            <Link
-              href={`/incidents/${incident.id}/aar`}
-              className="text-sm text-zinc-500 hover:underline"
-            >
-              After Action Review
-            </Link>
-            <Link
-              href={`/incidents/${incident.id}/unit-logs`}
-              className="text-sm text-zinc-500 hover:underline"
-            >
-              Unit logs (214)
-            </Link>
-            <Link
-              href={`/incidents/${incident.id}/messages`}
-              className="text-sm text-zinc-500 hover:underline"
-            >
-              General messages (213)
-            </Link>
-            <Link
-              href={`/incidents/${incident.id}/communications`}
-              className="text-sm text-zinc-500 hover:underline"
-            >
-              Communications list (205A)
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-5xl px-6 py-8">
-        {selectedPeriod ? (
-          <>
-            <OperationalPeriodBar
-              incidentId={incident.id}
-              periods={periods ?? []}
-              selectedPeriod={selectedPeriod}
-              canEdit={canEdit}
-            />
-            <OrgChart
-              incidentId={incident.id}
-              operationalPeriodId={selectedPeriod.id}
-              facilityOrgId={incident.facility_org_id}
-              positions={positions ?? []}
-              customPositions={customPositions ?? []}
-              staff={staff ?? []}
-              assignments={assignments ?? []}
-              qualifications={qualifications ?? []}
-              canEdit={canEdit}
-              canEditAssignments={canEdit && selectedPeriod.status === "active"}
-            />
-          </>
-        ) : (
-          <p className="text-sm text-zinc-500">No operational period found for this incident.</p>
-        )}
-      </main>
-    </div>
+    <main className="mx-auto max-w-5xl px-6 py-8">
+      {selectedPeriod ? (
+        <>
+          <OperationalPeriodBar
+            incidentId={incident.id}
+            periods={periods ?? []}
+            selectedPeriod={selectedPeriod}
+            canEdit={canEdit}
+          />
+          <OrgChart
+            incidentId={incident.id}
+            operationalPeriodId={selectedPeriod.id}
+            facilityOrgId={incident.facility_org_id}
+            positions={positions ?? []}
+            customPositions={customPositions ?? []}
+            staff={staff ?? []}
+            assignments={assignments ?? []}
+            qualifications={qualifications ?? []}
+            canEdit={canEdit}
+            canEditAssignments={canEdit && selectedPeriod.status === "active"}
+          />
+        </>
+      ) : (
+        <p className="text-sm text-zinc-500">No operational period found for this incident.</p>
+      )}
+    </main>
   );
 }

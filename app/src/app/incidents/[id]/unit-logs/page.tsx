@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type {
@@ -74,28 +73,20 @@ export default async function UnitLogsPage({ params }: { params: Promise<{ id: s
   ]);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black">
-      <header className="border-b border-black/10 px-6 py-4 dark:border-white/10">
-        <Link href={`/incidents/${incident.id}`} className="text-sm text-zinc-500 hover:underline">
-          ← {incident.name}
-        </Link>
-        <h1 className="text-lg font-semibold text-black dark:text-zinc-50">Unit Activity Logs</h1>
-        <p className="text-sm text-zinc-500">
-          {incident.name} · ICS 214
-          {!canEdit && " · read-only (different facility)"}
-        </p>
-      </header>
+    <main className="mx-auto max-w-4xl px-6 py-8">
+      <div className="mb-6">
+        <h1 className="text-lg font-semibold text-black dark:text-zinc-50">Unit Activity Logs (HICS 214)</h1>
+        {!canEdit && <p className="text-sm text-zinc-500">Read-only (different facility)</p>}
+      </div>
 
-      <main className="mx-auto max-w-4xl px-6 py-8">
-        <UnitLogsPanel
-          incidentId={incident.id}
-          positions={positions ?? []}
-          unitLogs={unitLogs ?? []}
-          resources={resources ?? []}
-          entries={entries ?? []}
-          canEdit={canEdit}
-        />
-      </main>
-    </div>
+      <UnitLogsPanel
+        incidentId={incident.id}
+        positions={positions ?? []}
+        unitLogs={unitLogs ?? []}
+        resources={resources ?? []}
+        entries={entries ?? []}
+        canEdit={canEdit}
+      />
+    </main>
   );
 }

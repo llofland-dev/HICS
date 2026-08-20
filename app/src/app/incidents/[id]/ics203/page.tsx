@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type {
@@ -156,24 +155,18 @@ export default async function Ics203Page({
   const sectionOrder: PositionSection[] = ["Command", "Operations", "Planning", "Logistics", "Finance"];
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black print:bg-white">
-      <header className="flex items-center justify-between border-b border-black/10 px-6 py-4 print:hidden dark:border-white/10">
+    <main className="mx-auto max-w-4xl space-y-6 px-6 py-8 text-sm print:px-0 print:py-0 print:text-black">
+      <div className="flex items-center justify-between print:hidden">
         <div>
-          <Link href={`/incidents/${incident.id}`} className="text-sm text-zinc-500 hover:underline">
-            ← {incident.name}
-          </Link>
-          <h1 className="text-lg font-semibold text-black dark:text-zinc-50">
-            HICS 203 Organization List
-          </h1>
+          <h1 className="text-lg font-semibold text-black dark:text-zinc-50">HICS 203 Organization List</h1>
           <p className="text-sm text-zinc-500">
             {incident.name} · {incident.incident_date}
             {selectedPeriod && ` · Operational Period ${selectedPeriod.period_number}`}
           </p>
         </div>
         <PrintButton />
-      </header>
+      </div>
 
-      <main className="mx-auto max-w-4xl space-y-6 px-6 py-8 text-sm print:px-0 print:py-0 print:text-black">
         <div className="hidden print:block">
           <h1 className="text-center text-lg font-bold uppercase">HICS 203 Organization List</h1>
           <p className="text-center text-sm">
@@ -269,10 +262,9 @@ export default async function Ics203Page({
           />
         )}
 
-        <p className="mt-8 border-t border-black/10 pt-4 text-center text-[10px] text-zinc-400 print:border-black/30 print:text-black">
-          © {new Date().getFullYear()} Emergency Preparedness Solutions, LLC
-        </p>
-      </main>
-    </div>
+      <p className="mt-8 border-t border-black/10 pt-4 text-center text-[10px] text-zinc-400 print:border-black/30 print:text-black">
+        © {new Date().getFullYear()} Emergency Preparedness Solutions, LLC
+      </p>
+    </main>
   );
 }

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type {
@@ -143,14 +142,7 @@ export default async function CommunicationsListPage({
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black print:bg-white">
-      <header className="border-b border-black/10 px-6 py-4 print:hidden dark:border-white/10">
-        <Link href={`/incidents/${incident.id}`} className="text-sm text-zinc-500 hover:underline">
-          ← {incident.name}
-        </Link>
-      </header>
-
-      <main className="mx-auto max-w-3xl px-6 py-8 print:px-0 print:py-0">
+    <main className="mx-auto max-w-3xl px-6 py-8 print:px-0 print:py-0">
         <div className="mb-6 flex items-start justify-between">
           <div>
             <h1 className="text-lg font-semibold text-black dark:text-zinc-50 print:text-black">
@@ -201,6 +193,5 @@ export default async function CommunicationsListPage({
           © {new Date().getFullYear()} Emergency Preparedness Solutions, LLC
         </p>
       </main>
-    </div>
   );
 }

@@ -170,21 +170,16 @@ export default async function Ics201Page({
   });
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black">
-      <header className="border-b border-black/10 px-6 py-4 dark:border-white/10">
-        <Link href={`/incidents/${incident.id}`} className="text-sm text-zinc-500 hover:underline">
-          ← {incident.name}
-        </Link>
+    <main className="mx-auto max-w-4xl space-y-6 px-6 py-8">
+      <div>
         <h1 className="text-lg font-semibold text-black dark:text-zinc-50">HICS 201 Incident Briefing</h1>
         <p className="text-sm text-zinc-500">
-          {incident.name} · {incident.incident_date}
-          {selectedPeriod && ` · Operational Period ${selectedPeriod.period_number}`}
+          {selectedPeriod && `Operational Period ${selectedPeriod.period_number}`}
           {!canEdit && " · read-only (different facility)"}
         </p>
-      </header>
+      </div>
 
-      <main className="mx-auto max-w-4xl space-y-6 px-6 py-8">
-        {selectedPeriod ? (
+      {selectedPeriod ? (
           <>
             <p className="text-xs text-zinc-500">
               2. Operational Period: {selectedPeriod.date_from} {selectedPeriod.time_from} →{" "}
@@ -261,10 +256,9 @@ export default async function Ics201Page({
               canEdit={canEdit}
             />
           </>
-        ) : (
-          <p className="text-sm text-zinc-500">No operational period found for this incident.</p>
-        )}
-      </main>
-    </div>
+      ) : (
+        <p className="text-sm text-zinc-500">No operational period found for this incident.</p>
+      )}
+    </main>
   );
 }

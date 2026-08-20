@@ -133,13 +133,13 @@ export default async function AarReportPage({ params }: { params: Promise<{ id: 
   const fellShort = (commandHighlights ?? []).filter((h) => h.kind === "fell_short");
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black print:bg-white">
-      <header className="flex items-center justify-between border-b border-black/10 px-6 py-4 print:hidden dark:border-white/10">
+    <>
+      <div className="flex items-center justify-between px-6 py-4 print:hidden">
         <Link href={`/incidents/${incident.id}/aar`} className="text-sm text-zinc-500 hover:underline">
           ← Edit AAR
         </Link>
         <PrintButton />
-      </header>
+      </div>
 
       <main className="mx-auto max-w-4xl px-8 py-10 text-sm leading-relaxed print:px-0 print:py-0 print:text-black">
         <div className="mb-1 flex justify-between border-b-2 border-blue-900 pb-2 text-[10px] uppercase tracking-wide text-blue-900 print:text-black">
@@ -333,7 +333,7 @@ export default async function AarReportPage({ params }: { params: Promise<{ id: 
           © {new Date().getFullYear()} Emergency Preparedness Solutions, LLC
         </p>
       </main>
-    </div>
+    </>
   );
 }
 
