@@ -78,11 +78,21 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
         <Link href="/" className="text-sm text-zinc-500 hover:underline">
           ← Incidents
         </Link>
-        <h1 className="text-lg font-semibold text-black dark:text-zinc-50">{incident.name}</h1>
-        <p className="text-sm text-zinc-500">
-          {incident.incident_date} · {incident.type} · {incident.status}
-          {!canEdit && " · read-only (different facility)"}
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-semibold text-black dark:text-zinc-50">{incident.name}</h1>
+            <p className="text-sm text-zinc-500">
+              {incident.incident_date} · {incident.type} · {incident.status}
+              {!canEdit && " · read-only (different facility)"}
+            </p>
+          </div>
+          <Link
+            href={`/incidents/${incident.id}/communications`}
+            className="text-sm text-zinc-500 hover:underline"
+          >
+            Communications list (205A)
+          </Link>
+        </div>
       </header>
 
       <main className="mx-auto max-w-5xl px-6 py-8">
