@@ -274,6 +274,49 @@ export interface Ics204Unit {
   created_at: string;
 }
 
+export interface Ics201Briefing {
+  operational_period_id: string;
+  situation_summary: string | null;
+  health_safety_briefing: string | null;
+  map_attached: boolean;
+  map_note: string | null;
+  prepared_by_name: string | null;
+  prepared_by_signature: string | null;
+  briefing_at: string | null;
+  prepared_by_facility: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Ics201Objective {
+  id: string;
+  operational_period_id: string;
+  objective: string;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface Ics201Action {
+  id: string;
+  operational_period_id: string;
+  action_time: string | null;
+  description: string;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface Ics201Resource {
+  id: string;
+  operational_period_id: string;
+  resource: string;
+  date_time_ordered: string | null;
+  eta: string | null;
+  date_time_arrived: string | null;
+  notes: string | null;
+  sort_order: number;
+  created_at: string;
+}
+
 export interface Assignment {
   id: string;
   incident_id: string;
