@@ -61,6 +61,11 @@ export default async function Home() {
               Staff roster
             </Link>
           )}
+          {profile?.role === "facility_admin" && (
+            <Link href="/admin" className="text-sm text-zinc-500 hover:underline">
+              Admin
+            </Link>
+          )}
           <SignOutButton />
         </div>
       </header>

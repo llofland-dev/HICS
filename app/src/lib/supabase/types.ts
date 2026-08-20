@@ -20,6 +20,7 @@ export interface Profile {
   role: AppRole;
   first_name: string | null;
   last_name: string | null;
+  email: string | null;
 }
 
 export interface Incident {
