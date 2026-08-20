@@ -5,15 +5,24 @@ import type {
   Assignment,
   CustomPosition,
   Incident,
+  OperationalPeriod,
   Position,
   Profile,
   Staff,
   StaffQualification,
 } from "@/lib/supabase/types";
+import { OperationalPeriodBar } from "./operational-period-bar";
 import { OrgChart } from "./org-chart";
 
-export default async function IncidentPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function IncidentPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ op?: string }>;
+}) {
   const { id } = await params;
+  const { op } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -38,7 +47,7 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
 
   const canEdit = profile?.org_id === incident.facility_org_id;
 
-  const [{ data: positions }, { data: customPositions }, { data: staff }, { data: assignments }] =
+  const [{ data: positions }, { data: customPositions }, { data: staff }, { data: periods }] =
     await Promise.all([
       supabase
         .from("positions")
@@ -56,12 +65,29 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
         .order("name")
         .returns<Staff[]>(),
       supabase
-        .from("assignments")
-        .select("id, incident_id, position_code, custom_position_id, staff_id, assigned_at, unassigned_at")
+        .from("operational_periods")
+        .select("id, incident_id, period_number, date_from, time_from, date_to, time_to, status, created_at")
         .eq("incident_id", incident.id)
-        .is("unassigned_at", null)
-        .returns<Assignment[]>(),
+        .order("period_number", { ascending: true })
+        .returns<OperationalPeriod[]>(),
     ]);
+
+  const selectedPeriod =
+    (op && periods?.find((p) => p.id === op)) ??
+    periods?.find((p) => p.status === "active") ??
+    periods?.[periods.length - 1] ??
+    null;
+
+  const { data: assignments } = selectedPeriod
+    ? await supabase
+        .from("assignments")
+        .select(
+          "id, incident_id, operational_period_id, position_code, custom_position_id, staff_id, assigned_at, unassigned_at"
+        )
+        .eq("operational_period_id", selectedPeriod.id)
+        .is("unassigned_at", null)
+        .returns<Assignment[]>()
+    : { data: [] as Assignment[] };
 
   const staffIds = (staff ?? []).map((s) => s.id);
   const { data: qualifications } = staffIds.length
@@ -116,16 +142,30 @@ export default async function IncidentPage({ params }: { params: Promise<{ id: s
       </header>
 
       <main className="mx-auto max-w-5xl px-6 py-8">
-        <OrgChart
-          incidentId={incident.id}
-          facilityOrgId={incident.facility_org_id}
-          positions={positions ?? []}
-          customPositions={customPositions ?? []}
-          staff={staff ?? []}
-          assignments={assignments ?? []}
-          qualifications={qualifications ?? []}
-          canEdit={canEdit}
-        />
+        {selectedPeriod ? (
+          <>
+            <OperationalPeriodBar
+              incidentId={incident.id}
+              periods={periods ?? []}
+              selectedPeriod={selectedPeriod}
+              canEdit={canEdit}
+            />
+            <OrgChart
+              incidentId={incident.id}
+              operationalPeriodId={selectedPeriod.id}
+              facilityOrgId={incident.facility_org_id}
+              positions={positions ?? []}
+              customPositions={customPositions ?? []}
+              staff={staff ?? []}
+              assignments={assignments ?? []}
+              qualifications={qualifications ?? []}
+              canEdit={canEdit}
+              canEditAssignments={canEdit && selectedPeriod.status === "active"}
+            />
+          </>
+        ) : (
+          <p className="text-sm text-zinc-500">No operational period found for this incident.</p>
+        )}
       </main>
     </div>
   );

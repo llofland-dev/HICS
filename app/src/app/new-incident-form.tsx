@@ -20,17 +20,34 @@ export function NewIncidentForm({ facilityOrgId }: { facilityOrgId: string }) {
     setError(null);
     setSubmitting(true);
 
-    const { error } = await supabase.from("incidents").insert({
-      facility_org_id: facilityOrgId,
-      name,
-      incident_date: incidentDate,
-      type,
+    const { data: incident, error } = await supabase
+      .from("incidents")
+      .insert({
+        facility_org_id: facilityOrgId,
+        name,
+        incident_date: incidentDate,
+        type,
+      })
+      .select("id")
+      .single();
+
+    if (error) {
+      setSubmitting(false);
+      setError(error.message);
+      return;
+    }
+
+    const { error: periodError } = await supabase.from("operational_periods").insert({
+      incident_id: incident.id,
+      period_number: 1,
+      date_from: incidentDate,
+      time_from: new Date().toTimeString().slice(0, 8),
     });
 
     setSubmitting(false);
 
-    if (error) {
-      setError(error.message);
+    if (periodError) {
+      setError(periodError.message);
       return;
     }
 

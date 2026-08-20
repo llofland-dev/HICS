@@ -208,9 +208,22 @@ export interface AarCoordinationRole {
 export interface Assignment {
   id: string;
   incident_id: string;
+  operational_period_id: string;
   position_code: string | null;
   custom_position_id: string | null;
   staff_id: string;
   assigned_at: string;
   unassigned_at: string | null;
+}
+
+export interface OperationalPeriod {
+  id: string;
+  incident_id: string;
+  period_number: number;
+  date_from: string;
+  time_from: string;
+  date_to: string | null;
+  time_to: string | null;
+  status: "active" | "closed";
+  created_at: string;
 }

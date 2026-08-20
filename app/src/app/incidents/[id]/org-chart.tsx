@@ -57,6 +57,7 @@ function buildTree(positions: Position[]): TreeNode[] {
 
 interface OrgChartProps {
   incidentId: string;
+  operationalPeriodId: string;
   facilityOrgId: string;
   positions: Position[];
   customPositions: CustomPosition[];
@@ -64,10 +65,12 @@ interface OrgChartProps {
   assignments: Assignment[];
   qualifications: StaffQualification[];
   canEdit: boolean;
+  canEditAssignments: boolean;
 }
 
 export function OrgChart({
   incidentId,
+  operationalPeriodId,
   facilityOrgId,
   positions,
   customPositions,
@@ -75,6 +78,7 @@ export function OrgChart({
   assignments,
   qualifications,
   canEdit,
+  canEditAssignments,
 }: OrgChartProps) {
   const router = useRouter();
   const supabase = createClient();
@@ -126,6 +130,7 @@ export function OrgChart({
       if (staffId) {
         const { error } = await supabase.from("assignments").insert({
           incident_id: incidentId,
+          operational_period_id: operationalPeriodId,
           position_code: positionCode,
           custom_position_id: customPositionId,
           staff_id: staffId,
@@ -230,7 +235,7 @@ export function OrgChart({
           </div>
           <p className="mt-1 text-sm font-medium text-black dark:text-zinc-50">{node.title}</p>
 
-          {canEdit ? (
+          {canEditAssignments ? (
             <AssignSelect positionKey={key} positionCode={node.code} customPositionId={null} />
           ) : (
             <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
@@ -356,7 +361,7 @@ export function OrgChart({
                   <p className="mt-1 text-sm font-medium text-black dark:text-zinc-50">
                     {cp.title}
                   </p>
-                  {canEdit ? (
+                  {canEditAssignments ? (
                     <AssignSelect positionKey={key} positionCode={null} customPositionId={cp.id} />
                   ) : (
                     <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">

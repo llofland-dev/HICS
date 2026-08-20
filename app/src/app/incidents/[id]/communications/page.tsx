@@ -1,7 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { Assignment, CustomPosition, Incident, Position, Staff } from "@/lib/supabase/types";
+import type {
+  Assignment,
+  CustomPosition,
+  Incident,
+  OperationalPeriod,
+  Position,
+  Staff,
+} from "@/lib/supabase/types";
 import { PrintButton } from "./print-button";
 
 interface TreeNode extends Position {
@@ -40,8 +47,15 @@ interface CommsRow {
   phone: string | null;
 }
 
-export default async function CommunicationsListPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function CommunicationsListPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ op?: string }>;
+}) {
   const { id } = await params;
+  const { op } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -58,7 +72,7 @@ export default async function CommunicationsListPage({ params }: { params: Promi
 
   if (!incident) notFound();
 
-  const [{ data: positions }, { data: customPositions }, { data: staff }, { data: assignments }] =
+  const [{ data: positions }, { data: customPositions }, { data: staff }, { data: periods }] =
     await Promise.all([
       supabase
         .from("positions")
@@ -75,12 +89,27 @@ export default async function CommunicationsListPage({ params }: { params: Promi
         .eq("facility_org_id", incident.facility_org_id)
         .returns<Staff[]>(),
       supabase
+        .from("operational_periods")
+        .select("id, incident_id, period_number, date_from, time_from, date_to, time_to, status, created_at")
+        .eq("incident_id", incident.id)
+        .order("period_number", { ascending: true })
+        .returns<OperationalPeriod[]>(),
+    ]);
+
+  const selectedPeriod =
+    (op && periods?.find((p) => p.id === op)) ??
+    periods?.find((p) => p.status === "active") ??
+    periods?.[periods.length - 1] ??
+    null;
+
+  const { data: assignments } = selectedPeriod
+    ? await supabase
         .from("assignments")
         .select("id, incident_id, position_code, custom_position_id, staff_id, assigned_at, unassigned_at")
-        .eq("incident_id", incident.id)
+        .eq("operational_period_id", selectedPeriod.id)
         .is("unassigned_at", null)
-        .returns<Assignment[]>(),
-    ]);
+        .returns<Assignment[]>()
+    : { data: [] as Assignment[] };
 
   const staffById = new Map((staff ?? []).map((s) => [s.id, s]));
   const orderedPositions = flatten(buildTree(positions ?? []));
@@ -129,6 +158,7 @@ export default async function CommunicationsListPage({ params }: { params: Promi
             </h1>
             <p className="text-sm text-zinc-500 print:text-black">
               {incident.name} · {incident.incident_date} · ICS 205A
+              {selectedPeriod && ` · Operational Period ${selectedPeriod.period_number}`}
             </p>
           </div>
           <PrintButton />
