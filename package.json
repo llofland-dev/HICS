@@ -1,0 +1,7 @@
+{
+  "name": "hics",
+  "private": true,
+  "devDependencies": {
+    "supabase": "^2.115.0"
+  }
+}
