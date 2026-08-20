@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import type { Incident, Organization, Profile } from "@/lib/supabase/types";
 import { SignOutButton } from "./sign-out-button";
@@ -80,18 +81,23 @@ export default async function Home() {
               ) : (
                 <ul className="divide-y divide-black/10 rounded-lg border border-black/10 bg-white dark:divide-white/10 dark:border-white/10 dark:bg-zinc-950">
                   {incidents.map((incident) => (
-                    <li key={incident.id} className="flex items-center justify-between px-4 py-3">
-                      <div>
-                        <p className="text-sm font-medium text-black dark:text-zinc-50">
-                          {incident.name}
-                        </p>
-                        <p className="text-xs text-zinc-500">
-                          {incident.incident_date} · {incident.type}
-                        </p>
-                      </div>
-                      <span className="rounded-full bg-black/5 px-2 py-1 text-xs capitalize text-zinc-700 dark:bg-white/10 dark:text-zinc-300">
-                        {incident.status}
-                      </span>
+                    <li key={incident.id}>
+                      <Link
+                        href={`/incidents/${incident.id}`}
+                        className="flex items-center justify-between px-4 py-3 hover:bg-black/[.03] dark:hover:bg-white/[.04]"
+                      >
+                        <div>
+                          <p className="text-sm font-medium text-black dark:text-zinc-50">
+                            {incident.name}
+                          </p>
+                          <p className="text-xs text-zinc-500">
+                            {incident.incident_date} · {incident.type}
+                          </p>
+                        </div>
+                        <span className="rounded-full bg-black/5 px-2 py-1 text-xs capitalize text-zinc-700 dark:bg-white/10 dark:text-zinc-300">
+                          {incident.status}
+                        </span>
+                      </Link>
                     </li>
                   ))}
                 </ul>

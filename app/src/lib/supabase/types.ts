@@ -32,3 +32,48 @@ export interface Incident {
   status: IncidentStatus;
   created_at: string;
 }
+
+export type PositionSection = "Command" | "Operations" | "Planning" | "Logistics" | "Finance";
+export type PositionTier = "core" | "expansion";
+
+export interface Position {
+  code: string;
+  title: string;
+  section: PositionSection;
+  reports_to_code: string | null;
+  tier: PositionTier;
+  description: string | null;
+}
+
+export interface CustomPosition {
+  id: string;
+  facility_org_id: string;
+  title: string;
+  created_at: string;
+}
+
+export interface Staff {
+  id: string;
+  facility_org_id: string;
+  name: string;
+  role_title: string | null;
+  phone: string | null;
+  email: string | null;
+  notes: string | null;
+}
+
+export interface StaffQualification {
+  staff_id: string;
+  position_code: string;
+  qualified: boolean;
+}
+
+export interface Assignment {
+  id: string;
+  incident_id: string;
+  position_code: string | null;
+  custom_position_id: string | null;
+  staff_id: string;
+  assigned_at: string;
+  unassigned_at: string | null;
+}
