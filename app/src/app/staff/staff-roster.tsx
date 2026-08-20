@@ -252,8 +252,8 @@ export function StaffRoster({ facilityOrgId, staff, positions, qualifications }:
         {staff.length === 0 ? (
           <p className="text-sm text-zinc-500">No staff yet.</p>
         ) : (
-          <div className="overflow-hidden rounded-lg border border-black/10 dark:border-white/10">
-            <table className="w-full text-left text-sm">
+          <div className="overflow-x-auto rounded-lg border border-black/10 dark:border-white/10">
+            <table className="w-full min-w-[640px] text-left text-sm">
               <thead className="bg-black/[.03] text-xs text-zinc-600 dark:bg-white/[.04] dark:text-zinc-400">
                 <tr>
                   <th className="px-4 py-2 font-medium">Name</th>

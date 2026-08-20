@@ -478,7 +478,8 @@ function ResourcesSection({
   return (
     <SectionShell title="9. Summary of Resources Requested and Assigned">
       {resources.length > 0 && (
-        <table className="w-full text-left text-xs">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[520px] text-left text-xs">
           <thead className="text-zinc-500">
             <tr>
               <th className="py-1 pr-3 font-medium">Resource</th>
@@ -514,6 +515,7 @@ function ResourcesSection({
             ))}
           </tbody>
         </table>
+        </div>
       )}
       {canEdit &&
         (showAdd ? (
@@ -525,7 +527,7 @@ function ResourcesSection({
               onChange={(e) => setResource(e.target.value)}
               className={fieldClass()}
             />
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Date/Time ordered</label>
                 <input type="datetime-local" value={ordered} onChange={(e) => setOrdered(e.target.value)} className={fieldClass()} />
@@ -607,7 +609,7 @@ function PreparedBySection({
     <SectionShell title="10. Prepared by (Incident Commander)">
       {editing ? (
         <form onSubmit={handleSave} className="space-y-2">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <input placeholder="Print name" value={name} onChange={(e) => setName(e.target.value)} className={fieldClass()} />
             <input
               placeholder="Signature (typed name)"
@@ -616,7 +618,7 @@ function PreparedBySection({
               className={fieldClass()}
             />
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <div className="flex flex-col gap-1">
               <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Briefing date/time</label>
               <input

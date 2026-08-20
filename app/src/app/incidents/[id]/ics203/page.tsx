@@ -192,7 +192,8 @@ export default async function Ics203Page({
               >
                 {SECTION_TITLES[section]}
               </h2>
-              <table className="w-full border-collapse text-left text-xs">
+              <div className="overflow-x-auto">
+              <table className="w-full min-w-[420px] border-collapse text-left text-xs">
                 <thead>
                   <tr className="border-b border-black/20 text-zinc-600 dark:text-zinc-400">
                     <th className="py-1 pr-3 font-medium">Position</th>
@@ -216,6 +217,7 @@ export default async function Ics203Page({
                   })}
                 </tbody>
               </table>
+              </div>
             </section>
           );
         })}
@@ -225,7 +227,8 @@ export default async function Ics203Page({
             <h2 className="mb-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
               Additional / Custom Positions
             </h2>
-            <table className="w-full border-collapse text-left text-xs">
+            <div className="overflow-x-auto">
+            <table className="w-full min-w-[420px] border-collapse text-left text-xs">
               <thead>
                 <tr className="border-b border-black/20 text-zinc-600 dark:text-zinc-400">
                   <th className="py-1 pr-3 font-medium">Position</th>
@@ -249,6 +252,7 @@ export default async function Ics203Page({
                 })}
               </tbody>
             </table>
+            </div>
           </section>
         )}
 

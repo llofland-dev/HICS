@@ -342,7 +342,7 @@ function PreparedBySection({
     <SectionShell title="11. Prepared By">
       {editing ? (
         <form onSubmit={handleSave} className="space-y-2 print:hidden">
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             <input placeholder="Print name" value={name} onChange={(e) => setName(e.target.value)} className={fieldClass()} />
             <input
               placeholder="Signature (typed name)"

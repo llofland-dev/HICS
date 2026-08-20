@@ -158,7 +158,7 @@ export default async function AarReportPage({ params }: { params: Promise<{ id: 
             After Action Review &amp; Improvement Plan
           </p>
 
-          <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-1 text-left text-xs">
+          <dl className="mt-4 grid grid-cols-1 gap-x-6 gap-y-1 text-left text-xs sm:grid-cols-2">
             <div className="col-span-2">
               <span className="font-semibold">Event Name </span>
               {eventName}
@@ -190,7 +190,8 @@ export default async function AarReportPage({ params }: { params: Promise<{ id: 
           {timeline.length === 0 ? (
             <p className="text-zinc-500">No unit log entries recorded.</p>
           ) : (
-            <table className="w-full border-collapse text-left text-xs">
+            <div className="overflow-x-auto">
+            <table className="w-full min-w-[480px] border-collapse text-left text-xs">
               <thead>
                 <tr className="bg-blue-900 text-white print:bg-black">
                   <th className="border border-black/20 px-2 py-1 font-medium">Time</th>
@@ -210,6 +211,7 @@ export default async function AarReportPage({ params }: { params: Promise<{ id: 
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </ReportSection>
 
@@ -290,7 +292,8 @@ export default async function AarReportPage({ params }: { params: Promise<{ id: 
           {(actionItems ?? []).length === 0 ? (
             <p className="text-zinc-500">No corrective actions recorded.</p>
           ) : (
-            <table className="w-full border-collapse text-left text-xs">
+            <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] border-collapse text-left text-xs">
               <thead>
                 <tr className="bg-blue-900 text-white print:bg-black">
                   <th className="border border-black/20 px-2 py-1 font-medium">Core Element</th>
@@ -314,6 +317,7 @@ export default async function AarReportPage({ params }: { params: Promise<{ id: 
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </ReportSection>
 

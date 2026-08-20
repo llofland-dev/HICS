@@ -89,7 +89,7 @@ export function Ics204Panel({
             </button>
           ) : (
             <form onSubmit={handleCreate} className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Section</label>
                   <select
@@ -113,7 +113,7 @@ export function Ics204Panel({
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
                     Branch (if applicable)
@@ -312,7 +312,7 @@ function AssignmentListCard({
 
   return (
     <div className="overflow-hidden rounded-lg border border-black/10 bg-white text-sm dark:border-white/10 dark:bg-zinc-950">
-      <div className="grid grid-cols-2 divide-x divide-black/10 border-b border-black/10 dark:divide-white/10 dark:border-white/10">
+      <div className="grid grid-cols-1 divide-y divide-black/10 border-b border-black/10 sm:grid-cols-2 sm:divide-x sm:divide-y-0 dark:divide-white/10 dark:border-white/10">
         <div className="px-3 py-2">
           <span className="block text-xs font-medium text-zinc-500">Section</span>
           <p className="text-black dark:text-zinc-50">
@@ -334,6 +334,7 @@ function AssignmentListCard({
           5. Objectives / Strategies / Resources / Assigned Unit
         </span>
         {objectives.length > 0 && (
+          <div className="overflow-x-auto">
           <table className="mt-1 w-full text-left text-xs">
             <thead className="text-zinc-500">
               <tr>
@@ -371,6 +372,7 @@ function AssignmentListCard({
               ))}
             </tbody>
           </table>
+          </div>
         )}
 
         {canEdit &&
@@ -461,7 +463,7 @@ function AssignmentListCard({
         {canEdit &&
           (showAddUnit ? (
             <form onSubmit={handleAddUnit} className="mt-2 space-y-2">
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                 <input
                   required
                   placeholder="Unit name"

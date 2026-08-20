@@ -159,7 +159,8 @@ export default async function CommunicationsListPage({
         {rows.length === 0 ? (
           <p className="text-sm text-zinc-500 print:text-black">No positions assigned yet.</p>
         ) : (
-          <table className="w-full text-left text-sm print:text-black">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[480px] text-left text-sm print:text-black">
             <thead className="border-b border-black/20 text-xs text-zinc-600 print:text-black dark:text-zinc-400">
               <tr>
                 <th className="py-2 pr-4 font-medium">Name</th>
@@ -187,6 +188,7 @@ export default async function CommunicationsListPage({
               ))}
             </tbody>
           </table>
+          </div>
         )}
 
         <p className="mt-12 text-center text-xs text-zinc-400 print:text-black">

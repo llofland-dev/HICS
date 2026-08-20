@@ -134,7 +134,8 @@ function HazardsSection({
   return (
     <SectionShell title="3. Hazard Mitigation">
       {hazards.length > 0 && (
-        <table className="w-full text-left text-xs">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[640px] text-left text-xs">
           <thead className="text-zinc-500">
             <tr>
               <th className="py-1 pr-3 font-medium">Potential / Actual Hazards</th>
@@ -214,6 +215,7 @@ function HazardsSection({
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       {canEdit &&
@@ -315,7 +317,7 @@ function SignOffSection({
     <SectionShell title={title}>
       {editing ? (
         <form onSubmit={handleSave} className="space-y-2">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <input
               placeholder="Print name"
               value={nameValue}

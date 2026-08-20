@@ -22,23 +22,25 @@ export function IncidentNav({ incidentId }: { incidentId: string }) {
   const rootHref = `/incidents/${incidentId}`;
 
   return (
-    <nav className="flex flex-wrap gap-x-4 gap-y-1 border-b border-black/10 px-6 py-2 text-sm print:hidden dark:border-white/10">
-      {sections(incidentId).map((s) => {
-        const active = s.href === rootHref ? pathname === rootHref : pathname.startsWith(s.href);
-        return (
-          <Link
-            key={s.href}
-            href={s.href}
-            className={
-              active
-                ? "font-medium text-black dark:text-zinc-50"
-                : "text-zinc-500 hover:underline"
-            }
-          >
-            {s.label}
-          </Link>
-        );
-      })}
+    <nav className="overflow-x-auto border-b border-black/10 px-6 py-2 print:hidden dark:border-white/10">
+      <div className="flex w-max gap-x-4 text-sm sm:w-auto sm:flex-wrap sm:gap-y-1">
+        {sections(incidentId).map((s) => {
+          const active = s.href === rootHref ? pathname === rootHref : pathname.startsWith(s.href);
+          return (
+            <Link
+              key={s.href}
+              href={s.href}
+              className={
+                active
+                  ? "shrink-0 font-medium text-black dark:text-zinc-50"
+                  : "shrink-0 text-zinc-500 hover:underline"
+              }
+            >
+              {s.label}
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }

@@ -164,7 +164,7 @@ function HeaderSection({
   if (!editing) {
     return (
       <SectionShell title="Header & Executive Summary">
-        <dl className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+        <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
           <div>
             <dt className="text-xs font-medium text-zinc-500">Event Name</dt>
             <dd className="text-black dark:text-zinc-50">{aar?.event_name ?? incidentName}</dd>
@@ -209,7 +209,7 @@ function HeaderSection({
   return (
     <SectionShell title="Header & Executive Summary">
       <form onSubmit={handleSave} className="space-y-3">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="flex flex-col gap-1">
             <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Event Name</label>
             <input value={eventName} onChange={(e) => setEventName(e.target.value)} className={fieldClass()} />
@@ -219,7 +219,7 @@ function HeaderSection({
             <input value={eventType} onChange={(e) => setEventType(e.target.value)} className={fieldClass()} />
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div className="flex flex-col gap-1">
             <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Date From</label>
             <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className={fieldClass()} />
@@ -727,7 +727,7 @@ function CoordinationRolesList({
       {canEdit &&
         (showAdd ? (
           <form onSubmit={handleAdd} className="mt-2 space-y-2">
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <input
                 required
                 placeholder="Role (e.g. Incident Commander)"
@@ -797,7 +797,8 @@ function TimelinePreview({
       {timeline.length === 0 ? (
         <p className="text-sm text-zinc-500">No unit log entries yet.</p>
       ) : (
-        <table className="w-full text-left text-xs">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[480px] text-left text-xs">
           <thead className="text-zinc-500">
             <tr>
               <th className="w-32 py-1 pr-3 font-medium">Date/Time</th>
@@ -817,6 +818,7 @@ function TimelinePreview({
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </SectionShell>
   );
@@ -868,7 +870,8 @@ function ImprovementMatrixSection({
   return (
     <SectionShell title="Improvement Plan (IP) Matrix">
       {items.length > 0 && (
-        <table className="w-full text-left text-xs">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[640px] text-left text-xs">
           <thead className="text-zinc-500">
             <tr>
               <th className="w-32 py-1 pr-3 font-medium">Core Element</th>
@@ -903,6 +906,7 @@ function ImprovementMatrixSection({
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       {canEdit &&
@@ -1012,7 +1016,7 @@ function PreparedBySection({
     <SectionShell title="Prepared By">
       {editing ? (
         <form onSubmit={handleSave} className="space-y-2">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} className={fieldClass()} />
             <input
               placeholder="Title"
@@ -1021,7 +1025,7 @@ function PreparedBySection({
               className={fieldClass()}
             />
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <input
               placeholder="Organization"
               value={organization}
