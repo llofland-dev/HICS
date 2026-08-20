@@ -128,6 +128,83 @@ export interface UnitLogEntry {
   created_at: string;
 }
 
+export type CoreElement =
+  | "Communications"
+  | "Resources and Assets"
+  | "Safety and Security"
+  | "Staff Responsibilities"
+  | "Utilities Management"
+  | "Patient Clinical and Support Activities";
+
+export const CORE_ELEMENTS: CoreElement[] = [
+  "Communications",
+  "Resources and Assets",
+  "Safety and Security",
+  "Staff Responsibilities",
+  "Utilities Management",
+  "Patient Clinical and Support Activities",
+];
+
+export interface Aar {
+  incident_id: string;
+  summary: string | null;
+  event_name: string | null;
+  event_type: string | null;
+  date_from: string | null;
+  date_to: string | null;
+  report_date: string | null;
+  location: string | null;
+  command_structure_narrative: string | null;
+  conclusion: string | null;
+  prepared_by_name: string | null;
+  prepared_by_title: string | null;
+  prepared_by_organization: string | null;
+  prepared_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AarActionItem {
+  id: string;
+  incident_id: string;
+  core_element: CoreElement | null;
+  observation: string | null;
+  corrective_action: string;
+  responsible_entity: string | null;
+  due_date: string | null;
+  status: "open" | "in_progress" | "done";
+  created_at: string;
+}
+
+export interface AarCoreElementNote {
+  id: string;
+  incident_id: string;
+  core_element: CoreElement;
+  label: string;
+  narrative: string;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface AarCommandHighlight {
+  id: string;
+  incident_id: string;
+  kind: "worked" | "fell_short";
+  narrative: string;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface AarCoordinationRole {
+  id: string;
+  incident_id: string;
+  role_title: string;
+  person_name: string | null;
+  description: string | null;
+  sort_order: number;
+  created_at: string;
+}
+
 export interface Assignment {
   id: string;
   incident_id: string;
