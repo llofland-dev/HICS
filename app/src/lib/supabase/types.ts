@@ -1,5 +1,5 @@
-// Hand-written row types matching supabase/migrations/20260819210000_schema.sql.
-// Replace with `supabase gen types typescript` output once a live project exists.
+// Hand-written row types matching the migrations in supabase/migrations.
+// Replace with `supabase gen types typescript` output once schema churn settles.
 
 export type OrgType = "system" | "facility";
 export type IncidentType = "incident" | "exercise" | "tabletop";
@@ -18,7 +18,8 @@ export interface Profile {
   id: string;
   org_id: string | null;
   role: AppRole;
-  display_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
 }
 
 export interface Incident {

@@ -18,9 +18,11 @@ export default async function Home() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, org_id, role, display_name")
+    .select("id, org_id, role, first_name, last_name")
     .eq("id", user.id)
     .maybeSingle<Profile>();
+
+  const fullName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ");
 
   const org = profile?.org_id
     ? (
@@ -51,7 +53,7 @@ export default async function Home() {
             HICS Incident Tracker
           </h1>
           <p className="text-sm text-zinc-500">
-            {org ? org.name : "No facility assigned"} · {user.email}
+            {fullName || user.email} · {org ? org.name : "No facility assigned"}
           </p>
         </div>
         <SignOutButton />
