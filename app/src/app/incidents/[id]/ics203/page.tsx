@@ -163,7 +163,7 @@ export default async function Ics203Page({
             ← {incident.name}
           </Link>
           <h1 className="text-lg font-semibold text-black dark:text-zinc-50">
-            Organization Assignment List (HICS 203)
+            HICS 203 Organization List
           </h1>
           <p className="text-sm text-zinc-500">
             {incident.name} · {incident.incident_date}
@@ -175,7 +175,7 @@ export default async function Ics203Page({
 
       <main className="mx-auto max-w-4xl space-y-6 px-6 py-8 text-sm print:px-0 print:py-0 print:text-black">
         <div className="hidden print:block">
-          <h1 className="text-center text-lg font-bold uppercase">Organization Assignment List (HICS 203)</h1>
+          <h1 className="text-center text-lg font-bold uppercase">HICS 203 Organization List</h1>
           <p className="text-center text-sm">
             {incident.name}
             {selectedPeriod && ` · Operational Period ${selectedPeriod.period_number}`}

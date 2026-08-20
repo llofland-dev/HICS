@@ -123,7 +123,7 @@ export default async function IncidentPage({
               href={`/incidents/${incident.id}/ics203`}
               className="text-sm text-zinc-500 hover:underline"
             >
-              Org assignment list (203)
+HICS 203 Organization List
             </Link>
             <Link
               href={`/incidents/${incident.id}/aar`}
