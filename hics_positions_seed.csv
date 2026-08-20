@@ -1,0 +1,68 @@
+code,title,section,reports_to_code,tier,description
+IC,Incident Commander,Command,,core,"Holds overall authority for the incident. Activates the Hospital Emergency Operations Plan, sets incident objectives, and is the final decision authority until relieved or the incident is closed."
+PIO,Public Information Officer,Command,IC,core,"Single point of contact for media and public information. Develops and releases approved public statements and coordinates with external public information officers (fire, law enforcement, public health)."
+SO,Safety Officer,Command,IC,core,"Monitors incident operations for hazards to patients, staff, and visitors. Has the authority to stop or modify any unsafe operation."
+LNO,Liaison Officer,Command,IC,core,"Primary point of contact for external responding agencies, other healthcare facilities, and government/public health officials."
+MTS,Medical/Technical Specialist,Command,IC,expansion,"Advises the Incident Commander on a specific technical area (e.g., infectious disease, hazmat, pediatric care, legal affairs, risk management, medical ethics). Specialty is noted per assignment."
+OSC,Operations Section Chief,Operations,IC,core,Directs execution of all tactical patient care and incident response activities defined in the Incident Action Plan.
+SM,Staging Manager,Operations,OSC,expansion,"Manages the staging area for arriving personnel, vehicles, equipment, and supplies before they are assigned to the incident."
+PSTL,Personnel Staging Team Leader,Operations,SM,expansion,"Checks in and stages arriving personnel (mutual aid staff, volunteers, credentialed providers) until assigned."
+VSTL,Vehicle Staging Team Leader,Operations,SM,expansion,"Stages arriving vehicles (ambulances, transport vehicles) in a designated area pending assignment."
+ESTL,Equipment/Supply Staging Team Leader,Operations,SM,expansion,Stages incoming equipment and supplies until distributed to the branch that requested them.
+MSTL,Medication Staging Team Leader,Operations,SM,expansion,Stages incoming pharmaceuticals and medical countermeasures pending distribution to treatment areas.
+MCB,Medical Care Branch Director,Operations,OSC,core,"Directs all patient care operations across inpatient, outpatient, casualty care, behavioral health, and clinical support functions."
+IPU,Inpatient Unit Leader,Operations,MCB,expansion,"Coordinates continuity of care for currently admitted patients, including evacuation or shelter-in-place decisions for inpatient units."
+OPU,Outpatient Unit Leader,Operations,MCB,expansion,"Coordinates care and flow for ambulatory/outpatient patients during the incident, including clinic and same-day service areas."
+CCU,Casualty Care Unit Leader,Operations,MCB,expansion,"Directs triage, treatment, and tracking of incoming casualties in a multi-casualty or mass-casualty incident."
+BHU,Behavioral Health Unit Leader,Operations,MCB,expansion,"Coordinates behavioral health and crisis counseling support for patients, families, and staff during and after the incident."
+CSU,Clinical Support Unit Leader,Operations,MCB,expansion,"Coordinates clinical support services (lab, pharmacy, imaging, respiratory therapy) needed to sustain patient care operations."
+PRU,Patient Registration Unit Leader,Operations,MCB,expansion,Maintains registration and tracking records for all patients presenting to or processed by the facility during the incident.
+INFB,Infrastructure Branch Director,Operations,OSC,core,"Directs management of the facility's physical systems and utilities during the incident: power, water, HVAC, structural integrity, and medical gases."
+PLU,Power/Lighting Unit Leader,Operations,INFB,expansion,"Manages facility power and lighting systems, including backup generator operation, during the incident."
+WSU,Water/Sewer Unit Leader,Operations,INFB,expansion,Manages facility water supply and sewer/wastewater systems during the incident.
+HVACU,HVAC Unit Leader,Operations,INFB,expansion,"Manages heating, ventilation, and air conditioning systems, including isolation/negative-pressure controls during the incident."
+BGU,Building/Grounds Unit Leader,Operations,INFB,expansion,"Assesses and manages structural and grounds damage, and coordinates repairs during the incident."
+MGU,Medical Gases Unit Leader,Operations,INFB,expansion,"Manages medical gas systems (oxygen, medical air, vacuum) during the incident."
+SECB,Security Branch Director,Operations,OSC,core,"Directs facility security operations during the incident: access control, crowd/traffic control, and law enforcement coordination."
+ACU,Access Control Unit Leader,Operations,SECB,expansion,Controls facility entry/exit points and restricts access to designated areas during the incident.
+CCTL,Crowd Control Unit Leader,Operations,SECB,expansion,"Manages family, visitor, and media crowds at facility entrances and perimeter during the incident."
+TCTL,Traffic Control Unit Leader,Operations,SECB,expansion,"Manages vehicle traffic flow around the facility, including ambulance and emergency vehicle access."
+SRCHU,Search Unit Leader,Operations,SECB,expansion,"Coordinates facility searches for hazards, suspicious items, or missing/wandering patients in coordination with law enforcement."
+LEIU,Law Enforcement Interface Unit Leader,Operations,SECB,expansion,Serves as the on-site point of contact for arriving law enforcement units.
+HZMB,HazMat Branch Director,Operations,OSC,core,"Directs response to hazardous material exposure, contamination, or spill events affecting the facility."
+DMU,Detection & Monitoring Unit Leader,Operations,HZMB,expansion,Monitors for hazardous material presence and spread using available detection equipment.
+SRU,Spill Response Unit Leader,Operations,HZMB,expansion,Directs containment and cleanup of a hazardous material spill within the facility.
+VDU,Victim Decontamination Unit Leader,Operations,HZMB,expansion,Directs decontamination of contaminated patients before they enter clinical treatment areas.
+FDU,Facility/Equipment Decontamination Unit Leader,Operations,HZMB,expansion,Directs decontamination of affected facility areas and equipment.
+BCB,Business Continuity Branch Director,Operations,OSC,expansion,"Directs efforts to maintain or restore critical business and clinical operations (records, IT, billing) during the incident."
+ITSU,IT Systems and Applications Unit Leader,Operations,BCB,expansion,"Maintains or restores IT systems and clinical applications (EHR, order entry) needed to sustain operations."
+SCU,Services Continuity Unit Leader,Operations,BCB,expansion,"Maintains continuity of essential support services (dietary, environmental services, materials management) during the incident."
+RMU,Records Management Unit Leader,Operations,BCB,expansion,Protects and manages critical facility and patient records during the incident.
+PFAB,Patient Family Assistance Branch Director,Operations,OSC,core,"Oversees patient and family support operations during the incident, including reunification and social services."
+SSU,Social Services Unit Leader,Operations,PFAB,expansion,Coordinates social work and support services for affected patients and families.
+FRU,Family Reunification Unit Leader,Operations,PFAB,core,"Executes patient-family reunification: holding area, identity verification, and release process."
+PSC,Planning Section Chief,Planning,IC,core,"Collects and evaluates incident information, tracks resource status, and develops the Incident Action Plan."
+RESU,Resources Unit Leader,Planning,PSC,core,Tracks the status and availability of personnel and equipment committed to the incident.
+PTM,Personnel Tracking Manager,Planning,RESU,expansion,Tracks the status and location of all personnel committed to the incident.
+MTM,Materiel Tracking Manager,Planning,RESU,expansion,Tracks the status and location of equipment and supplies committed to the incident.
+SITU,Situation Unit Leader,Planning,PSC,core,Maintains the real-time incident status board and overall situational picture.
+PATM,Patient Tracking Manager,Planning,SITU,expansion,"Tracks the real-time location, status, and disposition of every patient involved in the incident."
+BTM,Bed Tracking Manager,Planning,SITU,expansion,Tracks real-time bed availability and capacity across the facility during the incident.
+DOCU,Documentation Unit Leader,Planning,PSC,core,Maintains the incident log and archives records for the After Action Review.
+DEMU,Demobilization Unit Leader,Planning,PSC,expansion,"Plans and coordinates the safe, orderly release of resources and staff as the incident winds down."
+LSC,Logistics Section Chief,Logistics,IC,core,"Provides the facilities, equipment, and support resources needed to sustain the incident response."
+SVCB,Service Branch Director,Logistics,LSC,core,"Directs communications, IT equipment, and staff food/water services supporting the response."
+COMMU,Communications Unit Leader,Logistics,SVCB,expansion,Operates radios and internal communications equipment during the incident.
+ITEQU,IT/IS Equipment Unit Leader,Logistics,SVCB,expansion,Provides and maintains IT equipment needed to support the incident response.
+FSU,Food Services Unit Leader,Logistics,SVCB,expansion,"Coordinates food and water for staff, patients, and responders during an extended incident."
+SUPB,Support Branch Director,Logistics,LSC,core,"Directs supply, transportation, employee health, and credentialing support for the incident response."
+EHWU,Employee Health & Well-Being Unit Leader,Logistics,SUPB,expansion,Monitors staff wellbeing and manages rest/rotation during an extended incident.
+SUPU,Supply Unit Leader,Logistics,SUPB,expansion,Manages incident-related medical and non-medical supplies.
+TRANU,Transportation Unit Leader,Logistics,SUPB,expansion,"Coordinates vehicles and transport needed for patient movement, evacuation, or resource delivery."
+LPCU,Labor Pool & Credentialing Unit Leader,Logistics,SUPB,expansion,Verifies credentials of arriving volunteer or mutual-aid clinical staff before assignment.
+EFCU,Employee Family Care Unit Leader,Logistics,SUPB,expansion,Supports staff members whose own families are affected by the incident.
+FSC,Finance/Administration Section Chief,Finance,IC,core,"Tracks incident-related costs and documentation required for insurance, reimbursement, or regulatory claims."
+TIMEU,Time Unit Leader,Finance,FSC,core,Records staff hours worked during the incident for payroll and reimbursement documentation.
+PROCU,Procurement Unit Leader,Finance,FSC,expansion,Handles emergency purchasing and vendor contracts during the incident.
+COMPU,Compensation/Claims Unit Leader,Finance,FSC,expansion,"Documents injury, damage, or liability claims arising from the incident."
+COSTU,Cost Unit Leader,Finance,FSC,expansion,"Tracks total incident costs for budgeting, grant, and reimbursement purposes."
