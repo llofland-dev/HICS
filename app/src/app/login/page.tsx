@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
-  const router = useRouter();
   const supabase = createClient();
 
   const [email, setEmail] = useState("");
@@ -28,8 +26,12 @@ export default function LoginPage() {
       return;
     }
 
-    router.replace("/");
-    router.refresh();
+    // A client-side router navigation can fire before the browser has
+    // committed the new session cookie, racing the middleware's auth check
+    // on the very next request and bouncing back to /login. A hard
+    // navigation can't be issued until the cookie write is committed, which
+    // avoids the race by construction.
+    window.location.href = "/";
   }
 
   return (
