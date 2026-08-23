@@ -9,6 +9,7 @@ const sections = [
   { href: "/admin/contacts", label: "Contacts" },
   { href: "/admin/forms", label: "Forms" },
   { href: "/admin/checklists", label: "Checklists" },
+  { href: "/admin/import", label: "Import from Word" },
 ];
 
 export function AdminNav() {
