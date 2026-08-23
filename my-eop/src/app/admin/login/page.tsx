@@ -93,6 +93,12 @@ export default function AdminLoginPage() {
         </button>
 
         <p className="text-center text-sm text-zinc-500">
+          <Link href="/admin/forgot-password" className="underline">
+            Forgot password?
+          </Link>
+        </p>
+
+        <p className="text-center text-sm text-zinc-500">
           New organization?{" "}
           <Link href="/admin/signup" className="underline">
             Set up your plan

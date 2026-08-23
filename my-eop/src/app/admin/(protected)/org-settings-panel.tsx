@@ -29,6 +29,11 @@ export function OrgSettingsPanel({ org }: { org: Organization }) {
   const [adminPasswordError, setAdminPasswordError] = useState<string | null>(null);
   const [adminPasswordMessage, setAdminPasswordMessage] = useState<string | null>(null);
 
+  const [loginPassword, setLoginPassword] = useState("");
+  const [savingLoginPassword, setSavingLoginPassword] = useState(false);
+  const [loginPasswordError, setLoginPasswordError] = useState<string | null>(null);
+  const [loginPasswordMessage, setLoginPasswordMessage] = useState<string | null>(null);
+
   const fieldClass =
     "w-full rounded-md border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30";
 
@@ -121,8 +126,59 @@ export function OrgSettingsPanel({ org }: { org: Organization }) {
     );
   }
 
+  async function handleChangeLoginPassword(e: React.FormEvent) {
+    e.preventDefault();
+    setSavingLoginPassword(true);
+    setLoginPasswordError(null);
+    setLoginPasswordMessage(null);
+
+    const { error } = await supabase.auth.updateUser({ password: loginPassword });
+
+    setSavingLoginPassword(false);
+
+    if (error) {
+      setLoginPasswordError(error.message);
+      return;
+    }
+
+    setLoginPassword("");
+    setLoginPasswordMessage("Your login password has been updated.");
+  }
+
   return (
     <div className="space-y-6">
+      <section className="rounded-lg border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-950">
+        <h3 className="mb-1 text-sm font-medium text-zinc-600 dark:text-zinc-400">Your login</h3>
+        <p className="mb-3 text-sm text-zinc-500">
+          The password for this admin account (not the staff-facing passwords below).
+        </p>
+        <form onSubmit={handleChangeLoginPassword} className="flex flex-wrap items-end gap-3">
+          <div className="flex-1 space-y-1">
+            <label htmlFor="login-password" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+              New password
+            </label>
+            <input
+              id="login-password"
+              type="password"
+              required
+              minLength={8}
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              className={fieldClass}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={savingLoginPassword}
+            className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+          >
+            {savingLoginPassword ? "Saving..." : "Update"}
+          </button>
+        </form>
+        {loginPasswordError && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{loginPasswordError}</p>}
+        {loginPasswordMessage && <p className="mt-2 text-sm text-zinc-500">{loginPasswordMessage}</p>}
+      </section>
+
       <section className="rounded-lg border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-950">
         <h3 className="mb-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">Organization</h3>
         <form onSubmit={handleSaveName} className="flex flex-wrap items-end gap-3">
