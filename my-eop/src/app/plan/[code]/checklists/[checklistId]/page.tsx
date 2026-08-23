@@ -3,6 +3,7 @@ import { getVerifiedOrg } from "@/lib/eop-org";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Checklist, ChecklistItem } from "@/lib/supabase/types";
 import { categoryByKey } from "@/lib/categories";
+import { fetchCategoryContent, leafBackHref } from "@/lib/category-items";
 import { PlanHeader } from "../../plan-header";
 import { ChecklistRunner } from "./checklist-runner";
 
@@ -38,11 +39,22 @@ export default async function ChecklistPage({
   const checklistCategory = checklist.home_category ? categoryByKey(checklist.home_category) : undefined;
   if (checklistCategory?.requiresAdminTier && org.tier !== "admin") redirect(`/plan/${code}`);
 
-  const backHref = checklist.home_category
-    ? checklist.subcategory
-      ? `/plan/${code}/categories/${checklist.home_category}/${encodeURIComponent(checklist.subcategory)}`
-      : `/plan/${code}/categories/${checklist.home_category}`
-    : `/plan/${code}/checklists`;
+  let backHref = `/plan/${code}/checklists`;
+  if (checklist.home_category) {
+    const { allSections, sections, checklists } = await fetchCategoryContent(
+      admin,
+      org.id,
+      checklist.home_category
+    );
+    backHref = leafBackHref(
+      code,
+      checklist.home_category,
+      checklist.subcategory,
+      allSections,
+      sections,
+      checklists
+    );
+  }
 
   return (
     <div>

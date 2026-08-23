@@ -129,3 +129,45 @@ export function buildSubcategoryItems(
 
   return items;
 }
+
+// Where a category page's own "Back" link should point. A category with
+// exactly one top-level item redirects straight through it (see the
+// category route) — so pointing back at the category itself would just
+// bounce back to wherever the visitor already is. Skip straight to Home in
+// that case instead.
+export function categoryBackHref(
+  code: string,
+  categoryKey: string,
+  allSections: PlanSection[],
+  sections: PlanSection[],
+  checklists: Checklist[]
+): string {
+  const items = buildCategoryTopItems(code, categoryKey, allSections, sections, checklists);
+  return items.length === 1 ? `/plan/${code}` : `/plan/${code}/categories/${categoryKey}`;
+}
+
+// Where a section/checklist's own "Back" link should point, given its
+// category and (optional) subcategory. Same reasoning as categoryBackHref,
+// applied one level at a time: if this item is the only one in its
+// subcategory, going back to that subcategory list would just redirect
+// straight back here, so skip to wherever the subcategory's own back
+// would resolve to instead (which itself may skip the category too).
+export function leafBackHref(
+  code: string,
+  category: string | null,
+  subcategory: string | null,
+  allSections: PlanSection[],
+  categorySections: PlanSection[],
+  categoryChecklists: Checklist[]
+): string {
+  if (!category) return `/plan/${code}`;
+
+  if (subcategory) {
+    const subItems = buildSubcategoryItems(code, allSections, categorySections, categoryChecklists, subcategory);
+    if (subItems.length > 1) {
+      return `/plan/${code}/categories/${category}/${encodeURIComponent(subcategory)}`;
+    }
+  }
+
+  return categoryBackHref(code, category, allSections, categorySections, categoryChecklists);
+}

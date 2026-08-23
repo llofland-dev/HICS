@@ -2,9 +2,10 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getVerifiedOrg } from "@/lib/eop-org";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { PlanPage, PlanSection } from "@/lib/supabase/types";
+import type { Checklist, PlanPage, PlanSection } from "@/lib/supabase/types";
 import { colorForSection } from "@/lib/palette";
 import { categoryByKey } from "@/lib/categories";
+import { leafBackHref } from "@/lib/category-items";
 import { ChevronRightIcon } from "@/components/icons";
 import { PlanHeader } from "../../plan-header";
 
@@ -44,11 +45,25 @@ export default async function SectionPage({
   if (sectionCategory?.requiresAdminTier && org.tier !== "admin") redirect(`/plan/${code}`);
 
   const color = colorForSection(section, sectionIndex);
-  const backHref = section.category
-    ? section.subcategory
-      ? `/plan/${code}/categories/${section.category}/${encodeURIComponent(section.subcategory)}`
-      : `/plan/${code}/categories/${section.category}`
-    : `/plan/${code}`;
+
+  let backHref = `/plan/${code}`;
+  if (section.category) {
+    const { data: categoryChecklists } = await admin
+      .from("checklists")
+      .select("id, org_id, title, category, home_category, subcategory, sort_order, created_at")
+      .eq("org_id", org.id)
+      .eq("home_category", section.category)
+      .returns<Checklist[]>();
+    const categorySections = sections.filter((s) => s.category === section.category);
+    backHref = leafBackHref(
+      code,
+      section.category,
+      section.subcategory,
+      sections,
+      categorySections,
+      categoryChecklists ?? []
+    );
+  }
 
   return (
     <div>

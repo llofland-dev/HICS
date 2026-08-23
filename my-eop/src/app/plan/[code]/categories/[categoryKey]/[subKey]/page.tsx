@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getVerifiedOrg } from "@/lib/eop-org";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { categoryByKey } from "@/lib/categories";
-import { fetchCategoryContent, buildSubcategoryItems } from "@/lib/category-items";
+import { fetchCategoryContent, buildSubcategoryItems, categoryBackHref } from "@/lib/category-items";
 import { ChevronRightIcon } from "@/components/icons";
 import { PlanHeader } from "../../../plan-header";
 
@@ -33,7 +33,7 @@ export default async function SubcategoryPage({
     <div>
       <PlanHeader
         title={subcategory}
-        backHref={`/plan/${code}/categories/${categoryKey}`}
+        backHref={categoryBackHref(code, categoryKey, allSections, sections, checklists)}
         color={category.color.button}
         logoUrl={org.logoUrl}
       />
