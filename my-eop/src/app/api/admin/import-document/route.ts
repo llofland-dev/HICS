@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { parseDocxAsSection, parseDocxAsChecklist } from "@/lib/docx-import";
+import { parseDocumentAsSection, parseDocumentAsChecklist, extensionOf } from "@/lib/document-import";
 
-// Parses an uploaded .docx into a draft only — nothing is written to the
+// Parses an uploaded document into a draft only — nothing is written to the
 // database here. The admin reviews/edits the draft client-side and publishes
 // it themselves via the normal Supabase-client inserts (see import-form.tsx),
 // same RLS-scoped path as every other admin write in this app.
@@ -25,8 +25,8 @@ export async function POST(request: Request) {
   if (targetType !== "section" && targetType !== "checklist") {
     return NextResponse.json({ error: "Invalid targetType" }, { status: 400 });
   }
-  if (!file.name.toLowerCase().endsWith(".docx")) {
-    return NextResponse.json({ error: "Only .docx files are supported right now" }, { status: 400 });
+  if (!extensionOf(file.name)) {
+    return NextResponse.json({ error: "Only .docx, .xlsx, and .pdf files are supported" }, { status: 400 });
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
@@ -34,8 +34,8 @@ export async function POST(request: Request) {
   try {
     const draft =
       targetType === "section"
-        ? await parseDocxAsSection(buffer, file.name)
-        : await parseDocxAsChecklist(buffer, file.name);
+        ? await parseDocumentAsSection(buffer, file.name)
+        : await parseDocumentAsChecklist(buffer, file.name);
     return NextResponse.json({ targetType, draft });
   } catch (err) {
     return NextResponse.json(

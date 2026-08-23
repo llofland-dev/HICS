@@ -37,8 +37,9 @@ export default async function ImportPage() {
       <div>
         <h2 className="text-lg font-semibold text-black dark:text-zinc-50">Import from Word</h2>
         <p className="text-sm text-zinc-500">
-          Upload a .docx and review the parsed result before publishing — nothing goes live until
-          you approve it. Only .docx is supported today.
+          Upload a Word, Excel, or PDF file and review the parsed result before publishing —
+          nothing goes live until you approve it. Word documents parse with the most structure
+          (bold text, tables); PDFs are plain text only, so expect more cleanup in the review step.
         </p>
       </div>
 

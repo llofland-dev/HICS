@@ -34,6 +34,9 @@ export function ImportForm({
   const [sectionColor, setSectionColor] = useState("");
   const [sectionCategory, setSectionCategory] = useState(CATEGORIES[0].key);
   const [sectionSubcategory, setSectionSubcategory] = useState("");
+  // "new" creates a section; any other value is the id of an existing
+  // section to append these pages to instead.
+  const [sectionTarget, setSectionTarget] = useState<string>("new");
 
   const [checklistDraft, setChecklistDraft] = useState<ChecklistDraft | null>(null);
   const [checklistItemsText, setChecklistItemsText] = useState("");
@@ -55,7 +58,7 @@ export function ImportForm({
     formData.append("file", file);
     formData.append("targetType", targetType);
 
-    const res = await fetch("/api/admin/import-docx", { method: "POST", body: formData });
+    const res = await fetch("/api/admin/import-document", { method: "POST", body: formData });
     const body = await res.json();
     setUploading(false);
 
@@ -78,32 +81,46 @@ export function ImportForm({
     setPublishing(true);
     setError(null);
 
-    const nextSectionOrder = sections.reduce((max, s) => Math.max(max, s.sort_order), 0) + 1;
-    const { data: newSection, error: sectionError } = await supabase
-      .from("plan_sections")
-      .insert({
-        org_id: orgId,
-        title: sectionDraft.title,
-        color_key: sectionColor || null,
-        category: sectionCategory,
-        subcategory: sectionSubcategory.trim() || null,
-        sort_order: nextSectionOrder,
-      })
-      .select("id")
-      .single();
+    let sectionId = sectionTarget;
+    let startOrder = 1;
 
-    if (sectionError || !newSection) {
-      setPublishing(false);
-      setError(sectionError?.message ?? "Couldn't create the section.");
-      return;
+    if (sectionTarget === "new") {
+      const nextSectionOrder = sections.reduce((max, s) => Math.max(max, s.sort_order), 0) + 1;
+      const { data: newSection, error: sectionError } = await supabase
+        .from("plan_sections")
+        .insert({
+          org_id: orgId,
+          title: sectionDraft.title,
+          color_key: sectionColor || null,
+          category: sectionCategory,
+          subcategory: sectionSubcategory.trim() || null,
+          sort_order: nextSectionOrder,
+        })
+        .select("id")
+        .single();
+
+      if (sectionError || !newSection) {
+        setPublishing(false);
+        setError(sectionError?.message ?? "Couldn't create the section.");
+        return;
+      }
+      sectionId = newSection.id;
+    } else {
+      const { data: existingPages } = await supabase
+        .from("plan_pages")
+        .select("sort_order")
+        .eq("section_id", sectionId)
+        .order("sort_order", { ascending: false })
+        .limit(1);
+      startOrder = (existingPages?.[0]?.sort_order ?? 0) + 1;
     }
 
     const pageRows = sectionDraft.pages.map((page, i) => ({
       org_id: orgId,
-      section_id: newSection.id,
+      section_id: sectionId,
       title: page.title,
       body: page.body,
-      sort_order: i + 1,
+      sort_order: startOrder + i,
     }));
 
     const { error: pagesError } = await supabase.from("plan_pages").insert(pageRows);
@@ -193,7 +210,7 @@ export function ImportForm({
             </label>
           </div>
 
-          <input type="file" name="file" accept=".docx" required className={fieldClass} />
+          <input type="file" name="file" accept=".docx,.xlsx,.pdf" required className={fieldClass} />
 
           {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
@@ -214,45 +231,61 @@ export function ImportForm({
           </h3>
 
           <div className="space-y-1">
-            <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Section title</label>
-            <input
-              value={sectionDraft.title}
-              onChange={(e) => setSectionDraft({ ...sectionDraft, title: e.target.value })}
-              className={fieldClass}
-            />
+            <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Add these page(s) to</label>
+            <select value={sectionTarget} onChange={(e) => setSectionTarget(e.target.value)} className={fieldClass}>
+              <option value="new">A new section</option>
+              {sections.map((s) => (
+                <option key={s.id} value={s.id}>
+                  Existing: {s.title}
+                </option>
+              ))}
+            </select>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Category</label>
-              <select value={sectionCategory} onChange={(e) => setSectionCategory(e.target.value)} className={fieldClass}>
-                {CATEGORIES.map((c) => (
-                  <option key={c.key} value={c.key}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Subcategory (optional)</label>
-              <input
-                value={sectionSubcategory}
-                onChange={(e) => setSectionSubcategory(e.target.value)}
-                className={fieldClass}
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Color</label>
-              <select value={sectionColor} onChange={(e) => setSectionColor(e.target.value)} className={fieldClass}>
-                <option value="">Auto color</option>
-                {PALETTE.map((c) => (
-                  <option key={c.key} value={c.key}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+          {sectionTarget === "new" && (
+            <>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Section title</label>
+                <input
+                  value={sectionDraft.title}
+                  onChange={(e) => setSectionDraft({ ...sectionDraft, title: e.target.value })}
+                  className={fieldClass}
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Category</label>
+                  <select value={sectionCategory} onChange={(e) => setSectionCategory(e.target.value)} className={fieldClass}>
+                    {CATEGORIES.map((c) => (
+                      <option key={c.key} value={c.key}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Subcategory (optional)</label>
+                  <input
+                    value={sectionSubcategory}
+                    onChange={(e) => setSectionSubcategory(e.target.value)}
+                    className={fieldClass}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Color</label>
+                  <select value={sectionColor} onChange={(e) => setSectionColor(e.target.value)} className={fieldClass}>
+                    <option value="">Auto color</option>
+                    {PALETTE.map((c) => (
+                      <option key={c.key} value={c.key}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="space-y-3">
             <h4 className="text-xs font-medium uppercase tracking-wide text-zinc-500">
