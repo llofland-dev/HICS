@@ -4,6 +4,7 @@ import { getVerifiedOrg } from "@/lib/eop-org";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { PlanPage, PlanSection } from "@/lib/supabase/types";
 import { colorForSection } from "@/lib/palette";
+import { categoryByKey } from "@/lib/categories";
 import { PlanHeader } from "../../../../plan-header";
 import { Markdown } from "@/components/markdown";
 
@@ -21,7 +22,7 @@ export default async function PlanPageView({
   const [{ data: allSections }, { data: pages }] = await Promise.all([
     admin
       .from("plan_sections")
-      .select("id, org_id, title, color_key, sort_order, created_at")
+      .select("id, org_id, title, color_key, category, sort_order, created_at")
       .eq("org_id", org.id)
       .order("sort_order")
       .returns<PlanSection[]>(),
@@ -38,6 +39,9 @@ export default async function PlanPageView({
   const sectionIndex = sections.findIndex((s) => s.id === sectionId);
   const section = sectionIndex >= 0 ? sections[sectionIndex] : null;
   if (!section) notFound();
+
+  const sectionCategory = section.category ? categoryByKey(section.category) : undefined;
+  if (sectionCategory?.requiresAdminTier && org.tier !== "admin") redirect(`/plan/${code}`);
 
   const pageList = pages ?? [];
   const pageIndex = pageList.findIndex((p) => p.id === pageId);

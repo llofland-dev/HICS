@@ -12,6 +12,11 @@ export interface CategoryDef {
   label: string;
   icon: ComponentType<{ className?: string }>;
   color: PaletteColor;
+  // Command-level content (HICS org structure, Job Action Sheets, etc.) —
+  // only visible/reachable to the Facility Admin tier and above. Regular
+  // staff (User tier) never see this tile at all, and the category/section
+  // routes reject direct URL access too (see lib/category-items.ts callers).
+  requiresAdminTier?: boolean;
 }
 
 const byKey = new Map(PALETTE.map((c) => [c.key, c]));
@@ -21,7 +26,7 @@ const byKey = new Map(PALETTE.map((c) => [c.key, c]));
 // grow more sub-groups (e.g. Role Responsibilities) alongside it.
 export const CATEGORIES: CategoryDef[] = [
   { key: "codes", label: "Codes", icon: AlertIcon, color: byKey.get("red")! },
-  { key: "hics", label: "HICS", icon: SitemapIcon, color: byKey.get("blue")! },
+  { key: "hics", label: "HICS", icon: SitemapIcon, color: byKey.get("blue")!, requiresAdminTier: true },
   { key: "pots", label: "POTS", icon: PhoneIcon, color: byKey.get("teal")! },
 ];
 

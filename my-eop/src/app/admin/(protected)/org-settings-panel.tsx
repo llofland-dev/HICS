@@ -24,6 +24,11 @@ export function OrgSettingsPanel({ org }: { org: Organization }) {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [passwordMessage, setPasswordMessage] = useState<string | null>(null);
 
+  const [adminPassword, setAdminPassword] = useState("");
+  const [savingAdminPassword, setSavingAdminPassword] = useState(false);
+  const [adminPasswordError, setAdminPasswordError] = useState<string | null>(null);
+  const [adminPasswordMessage, setAdminPasswordMessage] = useState<string | null>(null);
+
   const fieldClass =
     "w-full rounded-md border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30";
 
@@ -95,6 +100,27 @@ export function OrgSettingsPanel({ org }: { org: Organization }) {
     setPasswordMessage(password ? "Password updated." : "Password removed — anyone with the code can view.");
   }
 
+  async function handleSetAdminPassword(e: React.FormEvent) {
+    e.preventDefault();
+    setSavingAdminPassword(true);
+    setAdminPasswordError(null);
+    setAdminPasswordMessage(null);
+
+    const { error } = await supabase.rpc("eop_set_org_admin_password", { p_password: adminPassword || null });
+
+    setSavingAdminPassword(false);
+
+    if (error) {
+      setAdminPasswordError(error.message);
+      return;
+    }
+
+    setAdminPassword("");
+    setAdminPasswordMessage(
+      adminPassword ? "Facility Admin passphrase updated." : "Facility Admin passphrase removed."
+    );
+  }
+
   return (
     <div className="space-y-6">
       <section className="rounded-lg border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-950">
@@ -153,10 +179,10 @@ export function OrgSettingsPanel({ org }: { org: Organization }) {
       </section>
 
       <section className="rounded-lg border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-950">
-        <h3 className="mb-1 text-sm font-medium text-zinc-600 dark:text-zinc-400">Access password</h3>
+        <h3 className="mb-1 text-sm font-medium text-zinc-600 dark:text-zinc-400">Staff password</h3>
         <p className="mb-3 text-sm text-zinc-500">
-          Optional second factor — staff need this after entering your plan code. Leave blank and
-          save to remove password protection entirely.
+          Optional second factor for general staff — needed after entering your plan code. Leave
+          blank and save to remove password protection entirely.
         </p>
         <form onSubmit={handleSetPassword} className="flex flex-wrap items-end gap-3">
           <div className="flex-1 space-y-1">
@@ -182,6 +208,40 @@ export function OrgSettingsPanel({ org }: { org: Organization }) {
         </form>
         {passwordError && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{passwordError}</p>}
         {passwordMessage && <p className="mt-2 text-sm text-zinc-500">{passwordMessage}</p>}
+      </section>
+
+      <section className="rounded-lg border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-950">
+        <h3 className="mb-1 text-sm font-medium text-zinc-600 dark:text-zinc-400">Facility Admin passphrase</h3>
+        <p className="mb-3 text-sm text-zinc-500">
+          A separate, elevated passphrase for whoever you designate as your facility&apos;s on-the-ground
+          admin (e.g. your Emergency Manager). Entering it at the plan code screen unlocks HICS/Job
+          Action Sheet content and the ability to update contact phone numbers and emails — nothing
+          else. No account or login required, same as the staff password above.
+        </p>
+        <form onSubmit={handleSetAdminPassword} className="flex flex-wrap items-end gap-3">
+          <div className="flex-1 space-y-1">
+            <label htmlFor="org-admin-password" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+              New passphrase
+            </label>
+            <input
+              id="org-admin-password"
+              type="password"
+              value={adminPassword}
+              onChange={(e) => setAdminPassword(e.target.value)}
+              placeholder="Leave blank to remove"
+              className={fieldClass}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={savingAdminPassword}
+            className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+          >
+            {savingAdminPassword ? "Saving..." : "Update"}
+          </button>
+        </form>
+        {adminPasswordError && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{adminPasswordError}</p>}
+        {adminPasswordMessage && <p className="mt-2 text-sm text-zinc-500">{adminPasswordMessage}</p>}
       </section>
     </div>
   );

@@ -4,6 +4,7 @@ import { getVerifiedOrg } from "@/lib/eop-org";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { PlanPage, PlanSection } from "@/lib/supabase/types";
 import { colorForSection } from "@/lib/palette";
+import { categoryByKey } from "@/lib/categories";
 import { ChevronRightIcon } from "@/components/icons";
 import { PlanHeader } from "../../plan-header";
 
@@ -38,6 +39,9 @@ export default async function SectionPage({
   const sectionIndex = sections.findIndex((s) => s.id === sectionId);
   const section = sectionIndex >= 0 ? sections[sectionIndex] : null;
   if (!section) notFound();
+
+  const sectionCategory = section.category ? categoryByKey(section.category) : undefined;
+  if (sectionCategory?.requiresAdminTier && org.tier !== "admin") redirect(`/plan/${code}`);
 
   const color = colorForSection(section, sectionIndex);
   const backHref = section.category

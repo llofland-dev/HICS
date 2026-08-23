@@ -10,13 +10,16 @@ export function AccessGate({
   code,
   orgName,
   hasPassword,
+  hasAdminPassword,
   logoUrl,
 }: {
   code: string;
   orgName: string;
   hasPassword: boolean;
+  hasAdminPassword: boolean;
   logoUrl?: string | null;
 }) {
+  const showPasswordField = hasPassword || hasAdminPassword;
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -62,15 +65,15 @@ export function AccessGate({
         </p>
 
         <form onSubmit={enter} className="space-y-4">
-          {hasPassword && (
+          {showPasswordField && (
             <input
               id="password"
               type="password"
-              required
+              required={hasPassword}
               autoFocus
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
+              placeholder={hasPassword ? "Password" : "Password (optional)"}
               className={`w-full rounded-full border border-black/10 bg-white px-4 py-3.5 text-base outline-none dark:border-white/10 dark:bg-zinc-950 ${BRAND.focusBorder}`}
             />
           )}

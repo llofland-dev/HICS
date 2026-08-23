@@ -2,10 +2,16 @@ import "server-only";
 import { cookies } from "next/headers";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { SESSION_COOKIE_NAME, verifySessionCookie } from "@/lib/eop-session";
+import { SESSION_COOKIE_NAME, verifySessionCookie, type AccessTier } from "@/lib/eop-session";
 import type { Organization } from "@/lib/supabase/types";
 
-export type OrgLookup = { id: string; name: string; has_password: boolean; logoUrl: string | null } | null;
+export type OrgLookup = {
+  id: string;
+  name: string;
+  has_password: boolean;
+  has_admin_password: boolean;
+  logoUrl: string | null;
+} | null;
 
 // Narrow, generic-free shape so this works with both the anon client below
 // and the service-role admin client — their full SupabaseClient<...> generic
@@ -36,18 +42,20 @@ export async function lookupOrgByCode(code: string): Promise<OrgLookup> {
 // already passed the code+password gate for THAT SPECIFIC code — a valid
 // cookie for org A doesn't grant access to org B's URL, and a stale cookie
 // pointing at a since-renamed code doesn't grant access either.
-export async function getVerifiedOrg(code: string): Promise<(Organization & { logoUrl: string | null }) | null> {
+export async function getVerifiedOrg(
+  code: string
+): Promise<(Organization & { logoUrl: string | null; tier: AccessTier }) | null> {
   const cookieStore = await cookies();
-  const orgId = verifySessionCookie(cookieStore.get(SESSION_COOKIE_NAME)?.value);
-  if (!orgId) return null;
+  const session = verifySessionCookie(cookieStore.get(SESSION_COOKIE_NAME)?.value);
+  if (!session) return null;
 
   const admin = createAdminClient();
   const { data } = await admin
     .from("organizations")
     .select("id, name, org_code, logo_path, created_at")
-    .eq("id", orgId)
+    .eq("id", session.orgId)
     .single();
 
   if (!data || data.org_code !== code) return null;
-  return { ...data, logoUrl: orgLogoUrl(admin, data.logo_path) };
+  return { ...data, logoUrl: orgLogoUrl(admin, data.logo_path), tier: session.tier };
 }

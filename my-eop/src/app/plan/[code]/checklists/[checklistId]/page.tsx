@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { getVerifiedOrg } from "@/lib/eop-org";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Checklist, ChecklistItem } from "@/lib/supabase/types";
+import { categoryByKey } from "@/lib/categories";
 import { PlanHeader } from "../../plan-header";
 import { ChecklistRunner } from "./checklist-runner";
 
@@ -33,6 +34,9 @@ export default async function ChecklistPage({
   ]);
 
   if (!checklist) notFound();
+
+  const checklistCategory = checklist.home_category ? categoryByKey(checklist.home_category) : undefined;
+  if (checklistCategory?.requiresAdminTier && org.tier !== "admin") redirect(`/plan/${code}`);
 
   const backHref = checklist.home_category
     ? checklist.subcategory

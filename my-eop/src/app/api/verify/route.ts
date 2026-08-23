@@ -28,18 +28,29 @@ export async function POST(request: Request) {
 
   const org = orgs[0] as { id: string; name: string; has_password: boolean };
 
-  if (org.has_password) {
-    const { data: ok, error: verifyError } = await supabase.rpc("eop_verify_org_password", {
+  // has_password means a password is REQUIRED for base (User-tier) entry.
+  // An org can also have a second, independent admin-tier passphrase even
+  // when has_password is false — in that case any input that isn't the
+  // admin passphrase just falls back to User tier rather than being
+  // rejected, since there's nothing "incorrect" about an optional field.
+  let tier: "user" | "admin" = "user";
+
+  if (password) {
+    const { data: matchedTier } = await supabase.rpc("eop_verify_org_password", {
       p_org_id: org.id,
-      p_password: password ?? "",
+      p_password: password,
     });
 
-    if (verifyError || !ok) {
+    if (matchedTier === "admin" || matchedTier === "user") {
+      tier = matchedTier;
+    } else if (org.has_password) {
       return NextResponse.json({ error: "Incorrect password" }, { status: 401 });
     }
+  } else if (org.has_password) {
+    return NextResponse.json({ error: "Incorrect password" }, { status: 401 });
   }
 
-  const cookie = createSessionCookie(org.id);
+  const cookie = createSessionCookie(org.id, tier);
   const response = NextResponse.json({ ok: true, name: org.name });
   response.cookies.set(cookie.name, cookie.value, {
     httpOnly: true,

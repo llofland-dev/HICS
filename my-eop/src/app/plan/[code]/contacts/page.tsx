@@ -22,7 +22,7 @@ export default async function ContactsPage({ params }: { params: Promise<{ code:
     <div>
       <PlanHeader title="Contacts" backHref={`/plan/${code}`} logoUrl={org.logoUrl} />
       <div className="mx-auto max-w-lg p-4">
-        <ContactsList contacts={contacts ?? []} />
+        <ContactsList contacts={contacts ?? []} canEdit={org.tier === "admin"} />
       </div>
     </div>
   );

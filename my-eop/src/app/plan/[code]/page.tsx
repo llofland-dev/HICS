@@ -33,7 +33,13 @@ export default async function PlanHubPage({ params }: { params: Promise<{ code: 
     }
 
     return (
-      <AccessGate code={code} orgName={lookup.name} hasPassword={lookup.has_password} logoUrl={lookup.logoUrl} />
+      <AccessGate
+        code={code}
+        orgName={lookup.name}
+        hasPassword={lookup.has_password}
+        hasAdminPassword={lookup.has_admin_password}
+        logoUrl={lookup.logoUrl}
+      />
     );
   }
 
@@ -48,7 +54,7 @@ export default async function PlanHubPage({ params }: { params: Promise<{ code: 
 
   const byKey = new Map(PALETTE.map((c) => [c.key, c]));
   const tiles = [
-    ...CATEGORIES.map((c) => ({
+    ...CATEGORIES.filter((c) => !c.requiresAdminTier || org.tier === "admin").map((c) => ({
       href: `/plan/${code}/categories/${c.key}`,
       label: c.label,
       icon: c.icon,

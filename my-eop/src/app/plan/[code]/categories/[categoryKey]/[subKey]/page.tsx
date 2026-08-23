@@ -18,6 +18,7 @@ export default async function SubcategoryPage({
 
   const category = categoryByKey(categoryKey);
   if (!category) notFound();
+  if (category.requiresAdminTier && org.tier !== "admin") redirect(`/plan/${code}`);
 
   const subcategory = decodeURIComponent(subKey);
 
