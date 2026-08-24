@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { getVerifiedOrg } from "@/lib/eop-org";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { Checklist, ChecklistItem } from "@/lib/supabase/types";
+import type { Checklist, ChecklistItem, Incident } from "@/lib/supabase/types";
 import { categoryByKey } from "@/lib/categories";
 import { fetchCategoryContent, leafBackHref } from "@/lib/category-items";
 import { PlanHeader } from "../../plan-header";
@@ -18,7 +18,7 @@ export default async function ChecklistPage({
 
   const admin = createAdminClient();
 
-  const [{ data: checklist }, { data: items }] = await Promise.all([
+  const [{ data: checklist }, { data: items }, { data: activeIncident }] = await Promise.all([
     admin
       .from("checklists")
       .select("id, org_id, title, description, category, home_category, subcategory, sort_order, created_at")
@@ -32,6 +32,12 @@ export default async function ChecklistPage({
       .eq("org_id", org.id)
       .order("sort_order")
       .returns<ChecklistItem[]>(),
+    admin
+      .from("incidents")
+      .select("id, org_id, name, status, started_at, closed_at")
+      .eq("org_id", org.id)
+      .eq("status", "active")
+      .maybeSingle<Incident>(),
   ]);
 
   if (!checklist) notFound();
@@ -66,7 +72,7 @@ export default async function ChecklistPage({
             {checklist.description}
           </p>
         )}
-        <ChecklistRunner checklist={checklist} items={items ?? []} />
+        <ChecklistRunner checklist={checklist} items={items ?? []} activeIncident={activeIncident ?? null} />
       </div>
     </div>
   );

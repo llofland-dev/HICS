@@ -1,21 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Checklist, ChecklistItem } from "@/lib/supabase/types";
+import type { Checklist, ChecklistItem, Incident } from "@/lib/supabase/types";
 import { BRAND } from "@/lib/palette";
+import { getActorName, setActorName } from "@/lib/actor-name";
 
-// Check-off state lives in localStorage only — it's for stepping through a
-// checklist during one drill/event on one device, not a synced record, so
-// there's no server round-trip here at all (works offline by construction).
+// Check-off state lives in localStorage — it's what makes the checkbox UI
+// itself instant and offline-proof, so that logic is untouched. Alongside
+// it, each toggle now also fires a best-effort POST to /api/checklist-event,
+// which is how a real incident's checklist activity becomes AAR evidence
+// (see MEDICS's aar/unit_log_entries for where that eventually lands). The
+// POST never blocks or gates the checkbox — if it fails (no connectivity,
+// server hiccup), the UI behaves exactly as it always has.
 export function ChecklistRunner({
   checklist,
   items,
+  activeIncident,
 }: {
   checklist: Checklist;
   items: ChecklistItem[];
+  activeIncident: Incident | null;
 }) {
   const storageKey = `eop-checklist-${checklist.id}`;
   const [checked, setChecked] = useState<Record<string, boolean>>({});
+  const [actorName, setActorNameState] = useState<string | null>(null);
+  const [nameDraft, setNameDraft] = useState("");
+  const [namePromptDismissed, setNamePromptDismissed] = useState(false);
 
   useEffect(() => {
     // Reading localStorage during the initial render (instead of here)
@@ -28,12 +38,30 @@ export function ChecklistRunner({
     } catch {
       // ignore malformed/unavailable storage
     }
+    setActorNameState(getActorName());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function toggle(id: string) {
+  function logEvent(itemId: string, itemText: string, action: "checked" | "unchecked") {
+    fetch("/api/checklist-event", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        checklistId: checklist.id,
+        itemId,
+        itemText,
+        action,
+        actorName: actorName ?? undefined,
+      }),
+    }).catch(() => {
+      // Best-effort only — the checkbox UI already reflects the change via
+      // localStorage regardless of whether this succeeds.
+    });
+  }
+
+  function toggle(item: ChecklistItem) {
     setChecked((prev) => {
-      const next = { ...prev, [id]: !prev[id] };
+      const next = { ...prev, [item.id]: !prev[item.id] };
       try {
         window.localStorage.setItem(storageKey, JSON.stringify(next));
       } catch {
@@ -41,6 +69,7 @@ export function ChecklistRunner({
       }
       return next;
     });
+    logEvent(item.id, item.text, checked[item.id] ? "unchecked" : "checked");
   }
 
   function reset() {
@@ -52,10 +81,49 @@ export function ChecklistRunner({
     }
   }
 
+  function saveActorName(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = nameDraft.trim();
+    if (!trimmed) return;
+    setActorName(trimmed);
+    setActorNameState(trimmed);
+  }
+
   const doneCount = items.filter((item) => checked[item.id]).length;
 
   return (
     <div className="space-y-4">
+      {activeIncident && (
+        <div className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900 shadow-sm dark:bg-amber-950 dark:text-amber-200">
+          Incident active: <span className="font-medium">{activeIncident.name}</span>
+        </div>
+      )}
+
+      {!actorName && !namePromptDismissed && (
+        <form
+          onSubmit={saveActorName}
+          className="flex flex-wrap items-center gap-2 rounded-xl bg-white px-4 py-3 text-sm shadow-sm dark:bg-zinc-950"
+        >
+          <span className="text-zinc-500">Add your name so activity shows who did what — optional.</span>
+          <input
+            value={nameDraft}
+            onChange={(e) => setNameDraft(e.target.value)}
+            placeholder="Your name"
+            className="min-w-0 flex-1 rounded-md border border-black/10 bg-transparent px-2 py-1 outline-none dark:border-white/10"
+          />
+          <button type="submit" className="font-medium underline">
+            Save
+          </button>
+          <button
+            type="button"
+            onClick={() => setNamePromptDismissed(true)}
+            className="text-zinc-400 underline"
+          >
+            Skip
+          </button>
+        </form>
+      )}
+
       <div className="flex items-center justify-between text-sm text-zinc-500">
         <span>
           {doneCount} of {items.length} complete
@@ -74,7 +142,7 @@ export function ChecklistRunner({
             <input
               type="checkbox"
               checked={Boolean(checked[item.id])}
-              onChange={() => toggle(item.id)}
+              onChange={() => toggle(item)}
               className={`h-5 w-5 shrink-0 ${BRAND.accent}`}
             />
             <span

@@ -92,3 +92,24 @@ export interface ChecklistItem {
   text: string;
   sort_order: number;
 }
+
+export interface Incident {
+  id: string;
+  org_id: string;
+  name: string;
+  status: "active" | "closed";
+  started_at: string;
+  closed_at: string | null;
+}
+
+export interface ChecklistEvent {
+  id: string;
+  org_id: string;
+  incident_id: string | null;
+  checklist_id: string;
+  checklist_item_id: string;
+  item_text: string;
+  action: "checked" | "unchecked";
+  actor_name: string | null;
+  created_at: string;
+}
