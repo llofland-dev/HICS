@@ -11,6 +11,7 @@ export interface Organization {
   name: string;
   type: OrgType;
   parent_org_id: string | null;
+  playbook_org_code: string | null;
   created_at: string;
 }
 
