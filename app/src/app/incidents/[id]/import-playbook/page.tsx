@@ -14,7 +14,7 @@ export default async function ImportPlaybookPage({ params }: { params: Promise<{
 
   const { data: incident } = await supabase
     .from("incidents")
-    .select("id, facility_org_id, event_id, name, incident_date, type, status, created_at")
+    .select("id, facility_org_id, event_id, playbook_incident_id, name, incident_date, type, status, created_at")
     .eq("id", id)
     .maybeSingle<Incident>();
   if (!incident) notFound();
@@ -50,6 +50,7 @@ export default async function ImportPlaybookPage({ params }: { params: Promise<{
         incidentId={incident.id}
         orgId={profile?.org_id ?? null}
         playbookOrgCode={org?.playbook_org_code ?? null}
+        playbookIncidentId={incident.playbook_incident_id}
         isSystemAdmin={profile?.role === "system_admin"}
         canEdit={canEdit}
       />

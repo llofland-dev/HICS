@@ -12,6 +12,7 @@ export interface Organization {
   type: OrgType;
   parent_org_id: string | null;
   playbook_org_code: string | null;
+  org_code: string | null;
   created_at: string;
 }
 
@@ -22,12 +23,15 @@ export interface Profile {
   first_name: string | null;
   last_name: string | null;
   email: string | null;
+  requested_org_code: string | null;
+  requested_org_id: string | null;
 }
 
 export interface Incident {
   id: string;
   facility_org_id: string;
   event_id: string | null;
+  playbook_incident_id: string | null;
   name: string;
   incident_date: string;
   type: IncidentType;
@@ -185,6 +189,17 @@ export interface AarCoreElementNote {
   label: string;
   narrative: string;
   sort_order: number;
+  created_at: string;
+}
+
+export interface AarTimelineEntry {
+  id: string;
+  incident_id: string;
+  entry_date: string;
+  entry_time: string;
+  phase: string | null;
+  description: string;
+  source_unit_log_entry_id: string | null;
   created_at: string;
 }
 

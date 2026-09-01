@@ -96,5 +96,10 @@ export async function POST(request: Request) {
     }
   }
 
+  // Remember which Playbook incident this one was matched to, so the picker
+  // doesn't need to be re-shown on the next visit -- gated by the same
+  // incidents_update RLS policy that already covers incidents.event_id.
+  await supabase.from("incidents").update({ playbook_incident_id: playbookIncidentId }).eq("id", incidentId);
+
   return NextResponse.json({ ok: true, importedCount: entries.length });
 }

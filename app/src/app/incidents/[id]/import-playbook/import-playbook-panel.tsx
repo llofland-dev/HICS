@@ -16,17 +16,19 @@ interface ImportPlaybookPanelProps {
   incidentId: string;
   orgId: string | null;
   playbookOrgCode: string | null;
+  playbookIncidentId: string | null;
   isSystemAdmin: boolean;
   canEdit: boolean;
 }
 
 const fieldClass =
-  "w-full rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30";
+  "w-full rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]";
 
 export function ImportPlaybookPanel({
   incidentId,
   orgId,
   playbookOrgCode,
+  playbookIncidentId,
   isSystemAdmin,
   canEdit,
 }: ImportPlaybookPanelProps) {
@@ -39,7 +41,8 @@ export function ImportPlaybookPanel({
 
   const [incidents, setIncidents] = useState<PlaybookIncident[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [selectedId, setSelectedId] = useState("");
+  const [selectedId, setSelectedId] = useState(playbookIncidentId ?? "");
+  const [changingLink, setChangingLink] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [importedCount, setImportedCount] = useState<number | null>(null);
@@ -57,6 +60,8 @@ export function ImportPlaybookPanel({
       })
       .catch(() => setLoadError("Could not load Playbook incidents"));
   }, [playbookOrgCode]);
+
+  const linkedIncident = incidents?.find((incident) => incident.id === playbookIncidentId) ?? null;
 
   async function handleConnect(e: React.FormEvent) {
     e.preventDefault();
@@ -100,6 +105,8 @@ export function ImportPlaybookPanel({
     }
 
     setImportedCount(body.importedCount);
+    setChangingLink(false);
+    router.refresh();
   }
 
   if (!playbookOrgCode) {
@@ -129,7 +136,7 @@ export function ImportPlaybookPanel({
         <button
           type="submit"
           disabled={connecting}
-          className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+          className="rounded-md bg-[#00274c] px-4 py-1.5 text-sm font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
         >
           {connecting ? "Connecting..." : "Connect"}
         </button>
@@ -152,6 +159,53 @@ export function ImportPlaybookPanel({
 
   if (incidents.length === 0) {
     return <p className="text-sm text-zinc-500">No incidents found in Playbook for this org yet.</p>;
+  }
+
+  if (playbookIncidentId && !changingLink) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-md border border-black/10 bg-black/[.02] p-3 text-sm dark:border-white/10 dark:bg-white/[.03]">
+          <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Linked Playbook incident</p>
+          {linkedIncident ? (
+            <p className="font-medium text-black dark:text-zinc-50">
+              {linkedIncident.name} ({linkedIncident.status},{" "}
+              {new Date(linkedIncident.started_at).toLocaleDateString()})
+            </p>
+          ) : (
+            <p className="text-zinc-500">Not found in Playbook (it may have been deleted).</p>
+          )}
+          <button
+            onClick={() => setChangingLink(true)}
+            className="mt-2 text-xs text-zinc-500 underline hover:text-zinc-700 dark:hover:text-zinc-300"
+          >
+            Change linked incident
+          </button>
+        </div>
+
+        <button
+          onClick={handleImport}
+          disabled={importing}
+          className="rounded-md bg-[#00274c] px-4 py-1.5 text-sm font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
+        >
+          {importing ? "Importing..." : "Import latest activity"}
+        </button>
+        <p className="text-xs text-zinc-500">
+          Each import adds a new HICS 214 unit log entry batch — re-importing doesn&apos;t remove
+          what a previous import already added.
+        </p>
+
+        {importError && <p className="text-sm text-red-600 dark:text-red-400">{importError}</p>}
+        {importedCount !== null && (
+          <p className="text-sm text-zinc-500">
+            Imported {importedCount} {importedCount === 1 ? "entry" : "entries"}. View them under{" "}
+            <a href={`/incidents/${incidentId}/unit-logs`} className="underline">
+              HICS 214
+            </a>
+            .
+          </p>
+        )}
+      </div>
+    );
   }
 
   return (
@@ -178,10 +232,21 @@ export function ImportPlaybookPanel({
         <button
           onClick={handleImport}
           disabled={!selectedId || importing}
-          className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+          className="rounded-md bg-[#00274c] px-4 py-1.5 text-sm font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
         >
-          {importing ? "Importing..." : "Import"}
+          {importing ? "Importing..." : "Link & import"}
         </button>
+        {playbookIncidentId && (
+          <button
+            onClick={() => {
+              setChangingLink(false);
+              setSelectedId(playbookIncidentId);
+            }}
+            className="text-xs text-zinc-500 underline hover:text-zinc-700 dark:hover:text-zinc-300"
+          >
+            Cancel
+          </button>
+        )}
       </div>
 
       {importError && <p className="text-sm text-red-600 dark:text-red-400">{importError}</p>}
