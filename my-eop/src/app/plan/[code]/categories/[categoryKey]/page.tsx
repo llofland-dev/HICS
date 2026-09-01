@@ -44,7 +44,7 @@ export default async function CategoryPage({
                 <span className="flex min-w-0 items-center gap-3">
                   {item.iconUrl && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.iconUrl} alt="" className="h-8 w-8 shrink-0 rounded object-cover" />
+                    <img src={item.iconUrl} alt="" className="h-8 w-8 shrink-0 rounded object-contain" />
                   )}
                   <span className="min-w-0">
                     <span className="block truncate">{item.label}</span>

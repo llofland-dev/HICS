@@ -245,7 +245,7 @@ export function PlanEditor({
                       <img
                         src={supabase.storage.from("section-icons").getPublicUrl(section.icon_path).data.publicUrl}
                         alt=""
-                        className="h-8 w-8 shrink-0 rounded object-cover"
+                        className="h-8 w-8 shrink-0 rounded object-contain"
                       />
                     )}
                     <label className="cursor-pointer rounded-md border border-black/10 px-2 py-1 text-xs hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/10">
