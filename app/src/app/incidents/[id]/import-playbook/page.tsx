@@ -51,7 +51,7 @@ export default async function ImportPlaybookPage({ params }: { params: Promise<{
         orgId={profile?.org_id ?? null}
         playbookOrgCode={org?.playbook_org_code ?? null}
         playbookIncidentId={incident.playbook_incident_id}
-        isSystemAdmin={profile?.role === "system_admin"}
+        canConnect={canEdit && profile?.role === "facility_admin"}
         canEdit={canEdit}
       />
     </main>

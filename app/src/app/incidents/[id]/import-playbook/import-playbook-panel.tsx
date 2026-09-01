@@ -17,7 +17,7 @@ interface ImportPlaybookPanelProps {
   orgId: string | null;
   playbookOrgCode: string | null;
   playbookIncidentId: string | null;
-  isSystemAdmin: boolean;
+  canConnect: boolean;
   canEdit: boolean;
 }
 
@@ -29,7 +29,7 @@ export function ImportPlaybookPanel({
   orgId,
   playbookOrgCode,
   playbookIncidentId,
-  isSystemAdmin,
+  canConnect,
   canEdit,
 }: ImportPlaybookPanelProps) {
   const router = useRouter();
@@ -110,11 +110,11 @@ export function ImportPlaybookPanel({
   }
 
   if (!playbookOrgCode) {
-    if (!isSystemAdmin) {
+    if (!canConnect) {
       return (
         <p className="text-sm text-zinc-500">
-          This facility isn&apos;t connected to a Playbook org yet. Ask a system admin to connect it
-          here before you can import.
+          This facility isn&apos;t connected to a Playbook org yet. Ask your facility admin to connect
+          it here before you can import.
         </p>
       );
     }
