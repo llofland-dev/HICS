@@ -32,6 +32,13 @@ export async function updateSession(request: NextRequest) {
   const isPublicRoute =
     request.nextUrl.pathname.startsWith("/login") ||
     request.nextUrl.pathname.startsWith("/signup") ||
+    // Both reached before any session exists -- forgot-password is
+    // requested anonymously, and reset-password relies on the Supabase
+    // client exchanging the emailed recovery token for a session client-side
+    // (see the comment atop that page), which hasn't happened yet by the
+    // time this proxy runs on the initial navigation.
+    request.nextUrl.pathname.startsWith("/forgot-password") ||
+    request.nextUrl.pathname.startsWith("/reset-password") ||
     // Fires right after signUp(), before email confirmation -- no session
     // exists yet by design. See supabase/migrations/20260830120000_facility_request_functions.sql.
     request.nextUrl.pathname.startsWith("/api/facility-signup-notify");
