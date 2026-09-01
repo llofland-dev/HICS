@@ -13,7 +13,7 @@ import type {
 const SECTIONS: PositionSection[] = ["Command", "Operations", "Planning", "Logistics", "Finance"];
 
 function fieldClass() {
-  return "w-full rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30";
+  return "w-full rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]";
 }
 
 interface Ics204PanelProps {
@@ -83,7 +83,7 @@ export function Ics204Panel({
           {!showNew ? (
             <button
               onClick={() => setShowNew(true)}
-              className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
+              className="rounded-md bg-[#00274c] px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#001a35]"
             >
               New assignment list
             </button>
@@ -133,7 +133,7 @@ export function Ics204Panel({
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                  className="rounded-md bg-[#00274c] px-4 py-1.5 text-sm font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
                 >
                   {submitting ? "Creating..." : "Create"}
                 </button>
@@ -410,7 +410,7 @@ function AssignmentListCard({
                 <button
                   type="submit"
                   disabled={addingObjective}
-                  className="rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                  className="rounded-md bg-[#00274c] px-3 py-1 text-xs font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
                 >
                   Add
                 </button>
@@ -495,7 +495,7 @@ function AssignmentListCard({
                 <button
                   type="submit"
                   disabled={addingUnit}
-                  className="rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                  className="rounded-md bg-[#00274c] px-3 py-1 text-xs font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
                 >
                   Add
                 </button>
@@ -534,7 +534,7 @@ function AssignmentListCard({
               <button
                 type="submit"
                 disabled={savingSpecial}
-                className="rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                className="rounded-md bg-[#00274c] px-3 py-1 text-xs font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
               >
                 Save
               </button>
@@ -597,7 +597,7 @@ function AssignmentListCard({
                 <button
                   type="submit"
                   disabled={preparing}
-                  className="rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                  className="rounded-md bg-[#00274c] px-3 py-1 text-xs font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
                 >
                   {preparing ? "Saving..." : "Sign"}
                 </button>

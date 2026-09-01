@@ -7,6 +7,7 @@ import type {
   AarCommandHighlight,
   AarCoordinationRole,
   AarCoreElementNote,
+  AarTimelineEntry,
   Incident,
   Organization,
   Profile,
@@ -61,6 +62,7 @@ export default async function AarPage({ params }: { params: Promise<{ id: string
     { data: coreElementNotes },
     { data: commandHighlights },
     { data: coordinationRoles },
+    { data: timelineEntries },
     { data: unitLogs },
   ] = await Promise.all([
     supabase.from("aar").select("*").eq("incident_id", incident.id).maybeSingle<Aar>(),
@@ -89,6 +91,13 @@ export default async function AarPage({ params }: { params: Promise<{ id: string
       .order("sort_order", { ascending: true })
       .returns<AarCoordinationRole[]>(),
     supabase
+      .from("aar_timeline_entries")
+      .select("*")
+      .eq("incident_id", incident.id)
+      .order("entry_date", { ascending: true })
+      .order("entry_time", { ascending: true })
+      .returns<AarTimelineEntry[]>(),
+    supabase
       .from("unit_logs")
       .select(
         "id, incident_id, unit_name, position_code, leader_name, home_agency, op_period_date_from, op_period_date_to, op_period_time_from, op_period_time_to, prepared_by_name, prepared_by_position, prepared_by_signature, prepared_at, created_at"
@@ -109,7 +118,7 @@ export default async function AarPage({ params }: { params: Promise<{ id: string
     : { data: [] as UnitLogEntry[] };
 
   const unitNameByLogId = new Map((unitLogs ?? []).map((u) => [u.id, u.unit_name]));
-  const timeline = (entries ?? []).map((e) => ({
+  const importableEntries = (entries ?? []).map((e) => ({
     ...e,
     unit_name: unitNameByLogId.get(e.unit_log_id) ?? "",
   }));
@@ -141,7 +150,8 @@ export default async function AarPage({ params }: { params: Promise<{ id: string
         coreElementNotes={coreElementNotes ?? []}
         commandHighlights={commandHighlights ?? []}
         coordinationRoles={coordinationRoles ?? []}
-        timeline={timeline}
+        timelineEntries={timelineEntries ?? []}
+        importableEntries={importableEntries}
         canEdit={canEdit}
       />
     </main>

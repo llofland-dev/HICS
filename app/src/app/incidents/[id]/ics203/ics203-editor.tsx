@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { Ics203Details, Ics203ExternalRep, Ics203HospitalRep } from "@/lib/supabase/types";
 
 function fieldClass() {
-  return "w-full rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30";
+  return "w-full rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]";
 }
 
 function SectionShell({ title, children }: { title: string; children: React.ReactNode }) {
@@ -86,7 +86,7 @@ function AgencyExecutiveSection({
           <button
             type="submit"
             disabled={saving}
-            className="shrink-0 rounded-md bg-foreground px-3 py-1.5 text-sm font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+            className="shrink-0 rounded-md bg-[#00274c] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
           >
             Save
           </button>
@@ -189,7 +189,7 @@ function ExternalRepsSection({
             <button
               type="submit"
               disabled={saving}
-              className="shrink-0 rounded-md bg-foreground px-3 py-1.5 text-sm font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+              className="shrink-0 rounded-md bg-[#00274c] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
             >
               Add
             </button>
@@ -281,7 +281,7 @@ function HospitalRepsSection({
             <button
               type="submit"
               disabled={saving}
-              className="shrink-0 rounded-md bg-foreground px-3 py-1.5 text-sm font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+              className="shrink-0 rounded-md bg-[#00274c] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
             >
               Add
             </button>
@@ -356,7 +356,7 @@ function PreparedBySection({
             <button
               type="submit"
               disabled={saving}
-              className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+              className="rounded-md bg-[#00274c] px-4 py-1.5 text-sm font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
             >
               {saving ? "Saving..." : "Sign"}
             </button>

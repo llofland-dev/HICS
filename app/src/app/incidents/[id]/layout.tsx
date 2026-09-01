@@ -1,7 +1,9 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Incident, Profile } from "@/lib/supabase/types";
+import { TopBar } from "@/components/top-bar";
+import { STATUS_BADGE } from "@/lib/brand";
+import { CloseIncidentButton } from "./close-incident-button";
 import { IncidentNav } from "./incident-nav";
 
 export default async function IncidentLayout({ children, params }: LayoutProps<"/incidents/[id]">) {
@@ -32,16 +34,29 @@ export default async function IncidentLayout({ children, params }: LayoutProps<"
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black print:bg-white">
-      <header className="border-b border-black/10 px-6 py-4 print:hidden dark:border-white/10">
-        <Link href="/" className="text-sm text-zinc-500 hover:underline">
-          ← Incidents
-        </Link>
-        <h1 className="text-lg font-semibold text-black dark:text-zinc-50">{incident.name}</h1>
-        <p className="text-sm text-zinc-500">
-          {incident.incident_date} · {incident.type} · {incident.status}
-          {!canEdit && " · read-only (different facility)"}
-        </p>
-      </header>
+      <TopBar
+        title={incident.name}
+        backHref="/"
+        backLabel="Incidents"
+        subtitle={
+          <span className="flex flex-wrap items-center gap-2">
+            <span>
+              {incident.incident_date} · {incident.type}
+              {!canEdit && " · read-only (different facility)"}
+            </span>
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${STATUS_BADGE[incident.status] ?? "bg-white/10 text-white"}`}
+            >
+              {incident.status}
+            </span>
+          </span>
+        }
+        actions={
+          canEdit && incident.status === "active" ? (
+            <CloseIncidentButton incidentId={incident.id} />
+          ) : undefined
+        }
+      />
 
       <IncidentNav incidentId={incident.id} />
 

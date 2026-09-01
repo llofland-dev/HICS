@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { SECTION_COLORS } from "@/lib/section-colors";
+import { buildPositionTree, type PositionTreeNode } from "@/lib/position-tree";
 import type {
   Assignment,
   CustomPosition,
@@ -12,24 +13,169 @@ import type {
   StaffQualification,
 } from "@/lib/supabase/types";
 
-interface TreeNode extends Position {
-  children: TreeNode[];
+type TreeNode = PositionTreeNode;
+
+// Counts a node's descendants that would actually render given the current
+// expansion-tier toggle, so a branch's collapse button can say how many
+// positions it's hiding without including ones that are separately hidden.
+function countVisibleDescendants(node: TreeNode, showExpansion: boolean): number {
+  return node.children.reduce((sum, child) => {
+    if (child.tier === "expansion" && !showExpansion) return sum;
+    return sum + 1 + countVisibleDescendants(child, showExpansion);
+  }, 0);
 }
 
-function buildTree(positions: Position[]): TreeNode[] {
-  const nodes = new Map<string, TreeNode>();
-  positions.forEach((p) => nodes.set(p.code, { ...p, children: [] }));
+// Bundles everything the tree-rendering components below need but don't own
+// themselves, so they can live at module scope (required -- components
+// defined inside another component's render get recreated, and lose state,
+// on every render) without each one repeating a long prop list.
+interface ChartContext {
+  canEditAssignments: boolean;
+  assignmentByPosition: Map<string, Assignment>;
+  staffById: Map<string, Staff>;
+  qualifiedSet: Set<string>;
+  collapsibleCodes: Set<string>;
+  collapsed: Set<string>;
+  showExpansion: boolean;
+  staff: Staff[];
+  pending: string | null;
+  onAssign: (key: string, positionCode: string | null, customPositionId: string | null, staffId: string) => void;
+  onToggleCollapsed: (code: string) => void;
+}
 
-  const roots: TreeNode[] = [];
-  nodes.forEach((node) => {
-    if (node.reports_to_code && nodes.has(node.reports_to_code)) {
-      nodes.get(node.reports_to_code)!.children.push(node);
-    } else {
-      roots.push(node);
-    }
-  });
+function AssignSelect({
+  ctx,
+  positionKey,
+  positionCode,
+  customPositionId,
+}: {
+  ctx: ChartContext;
+  positionKey: string;
+  positionCode: string | null;
+  customPositionId: string | null;
+}) {
+  const current = ctx.assignmentByPosition.get(positionKey);
 
-  return roots;
+  return (
+    <select
+      disabled={ctx.pending === positionKey}
+      value={current?.staff_id ?? ""}
+      onChange={(e) => ctx.onAssign(positionKey, positionCode, customPositionId, e.target.value)}
+      className="mt-1 w-full rounded border border-black/10 bg-transparent px-1.5 py-1 text-xs outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]"
+    >
+      <option value="">— Vacant —</option>
+      {ctx.staff.map((s) => (
+        <option key={s.id} value={s.id}>
+          {s.name}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+// The card visual is the same at every tier -- only how nodes are arranged
+// around each other changes (see BranchColumn/SectionChiefColumn below).
+function PositionBox({ ctx, node }: { ctx: ChartContext; node: TreeNode }) {
+  const colors = SECTION_COLORS[node.section];
+  const key = node.code;
+  const current = ctx.assignmentByPosition.get(key);
+  const assignedStaff = current ? ctx.staffById.get(current.staff_id) : undefined;
+  const isUnqualified = current && !ctx.qualifiedSet.has(`${current.staff_id}:${node.code}`);
+  // collapsibleCodes only ever contains Section Chiefs (IC's direct reports
+  // that themselves have children), so this never fires for Command staff,
+  // branches, or units -- no extra check needed here.
+  const isCollapsible = ctx.collapsibleCodes.has(node.code);
+  const isCollapsed = isCollapsible && ctx.collapsed.has(node.code);
+
+  return (
+    <div
+      data-position-code={node.code}
+      className={`w-52 shrink-0 rounded-md border-2 bg-white p-2 dark:bg-zinc-950 ${colors.border}`}
+    >
+      <div className="flex items-center justify-between gap-1">
+        <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${colors.badge}`}>
+          {node.section}
+        </span>
+        {node.tier === "expansion" && (
+          <span className="text-[10px] text-zinc-400">expansion</span>
+        )}
+      </div>
+      <p className="mt-1 text-sm font-medium text-black dark:text-zinc-50">{node.title}</p>
+
+      {ctx.canEditAssignments ? (
+        <AssignSelect ctx={ctx} positionKey={key} positionCode={node.code} customPositionId={null} />
+      ) : (
+        <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+          {assignedStaff?.name ?? "Vacant"}
+        </p>
+      )}
+
+      {isUnqualified && assignedStaff && (
+        <p className="mt-1 flex items-center gap-1 text-[11px] text-amber-700 dark:text-amber-500">
+          ⚠ not marked qualified
+        </p>
+      )}
+
+      {isCollapsible && (
+        <button
+          onClick={() => ctx.onToggleCollapsed(node.code)}
+          className="mt-1.5 text-[11px] text-[#00274c] underline hover:no-underline dark:text-[#7ba6d6]"
+        >
+          {isCollapsed
+            ? `Show ${countVisibleDescendants(node, ctx.showExpansion)} more ↓`
+            : "Hide ↑"}
+        </button>
+      )}
+    </div>
+  );
+}
+
+// A branch (e.g. Medical Care Branch Director) and its own unit leaders,
+// stacked vertically in a single column -- matching the real HICS chart,
+// where a branch's units run straight down rather than spreading out
+// sideways. Only branches spread horizontally (in SectionChiefColumn
+// below); everything under a branch stays in its column.
+function BranchColumn({ ctx, node }: { ctx: ChartContext; node: TreeNode }) {
+  const visibleChildren = node.children.filter(
+    (child) => child.tier !== "expansion" || ctx.showExpansion
+  );
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <PositionBox ctx={ctx} node={node} />
+      {visibleChildren.map((child) => (
+        <div key={child.code} className="flex flex-col items-center gap-2">
+          <div className="h-3 w-px bg-black/15 dark:bg-white/15" />
+          <PositionBox ctx={ctx} node={child} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// A Section Chief and, when expanded, its branches spread horizontally (one
+// column per branch, per BranchColumn above).
+function SectionChiefColumn({ ctx, node }: { ctx: ChartContext; node: TreeNode }) {
+  const isCollapsed = ctx.collapsed.has(node.code);
+  const visibleChildren = node.children.filter(
+    (child) => child.tier !== "expansion" || ctx.showExpansion
+  );
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <PositionBox ctx={ctx} node={node} />
+      {!isCollapsed && visibleChildren.length > 0 && (
+        <>
+          <div className="h-4 w-px bg-black/15 dark:bg-white/15" />
+          <div className="flex gap-4">
+            {visibleChildren.map((branch) => (
+              <BranchColumn key={branch.code} ctx={ctx} node={branch} />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
 interface OrgChartProps {
@@ -65,7 +211,60 @@ export function OrgChart({
   const [newStaffName, setNewStaffName] = useState("");
   const [newPositionTitle, setNewPositionTitle] = useState("");
 
-  const tree = useMemo(() => buildTree(positions), [positions]);
+  const tree = useMemo(() => buildPositionTree(positions), [positions]);
+
+  // The primary positions (Incident Commander, plus everyone reporting
+  // directly to them -- PIO, Safety, Liaison, and the four Section Chiefs)
+  // always stay visible. Anything below a Section Chief -- branches, units --
+  // is what actually makes the chart wide (Operations alone has ~30
+  // positions), so those branches collapse by default, one toggle per
+  // Section Chief, rather than hiding individual positions piecemeal.
+  const collapsibleCodes = useMemo(() => {
+    const codes = new Set<string>();
+    tree.forEach((root) => {
+      root.children.forEach((child) => {
+        if (child.children.length > 0) codes.add(child.code);
+      });
+    });
+    return codes;
+  }, [tree]);
+
+  const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set(collapsibleCodes));
+
+  // IC's direct reports split into two visually distinct groups: Command
+  // staff (PIO, Safety, Liaison, M/T Specialist -- leaves, no children) sit
+  // in a tight cluster right under the IC card, while Section Chiefs (the
+  // ones with their own branches underneath) get the wider row below that.
+  // This mirrors the client's real chart, which draws Command staff as a
+  // compact block distinct from the section-chief row -- not one flat row
+  // of eight equal boxes.
+  const ic = tree.find((root) => root.code === "IC") ?? tree[0];
+  const icChildren = (ic?.children ?? []).filter(
+    (child) => child.tier !== "expansion" || showExpansion
+  );
+  const commandStaff = icChildren.filter((child) => child.children.length === 0);
+  const sectionChiefs = icChildren.filter((child) => child.children.length > 0);
+
+  function toggleCollapsed(code: string) {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(code)) next.delete(code);
+      else next.add(code);
+      return next;
+    });
+  }
+
+  // The Incident Commander's card centers itself above its own (very wide)
+  // subtree via `items-center`, so on first load it can sit well to the
+  // right of the scroll container's left edge -- the opposite of what a
+  // user opening the chart to find "my position" needs. Scroll it to the
+  // start once on mount rather than changing the centered layout, which is
+  // what makes this read as a tree at all.
+  useEffect(() => {
+    document
+      .querySelector('[data-position-code="IC"]')
+      ?.scrollIntoView({ inline: "start", block: "nearest" });
+  }, []);
 
   const staffById = useMemo(() => new Map(staff.map((s) => [s.id, s])), [staff]);
 
@@ -157,105 +356,19 @@ export function OrgChart({
     router.refresh();
   }
 
-  function AssignSelect({
-    positionKey,
-    positionCode,
-    customPositionId,
-  }: {
-    positionKey: string;
-    positionCode: string | null;
-    customPositionId: string | null;
-  }) {
-    const current = assignmentByPosition.get(positionKey);
-
-    return (
-      <select
-        disabled={pending === positionKey}
-        value={current?.staff_id ?? ""}
-        onChange={(e) => handleAssign(positionKey, positionCode, customPositionId, e.target.value)}
-        className="mt-1 w-full rounded border border-black/10 bg-transparent px-1.5 py-1 text-xs outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30"
-      >
-        <option value="">— Vacant —</option>
-        {staff.map((s) => (
-          <option key={s.id} value={s.id}>
-            {s.name}
-          </option>
-        ))}
-      </select>
-    );
-  }
-
-  function PositionCard({ node }: { node: TreeNode }) {
-    if (node.tier === "expansion" && !showExpansion) return null;
-
-    const colors = SECTION_COLORS[node.section];
-    const key = node.code;
-    const current = assignmentByPosition.get(key);
-    const assignedStaff = current ? staffById.get(current.staff_id) : undefined;
-    const isUnqualified =
-      current && !qualifiedSet.has(`${current.staff_id}:${node.code}`);
-
-    const visibleChildren = node.children.filter(
-      (child) => child.tier !== "expansion" || showExpansion
-    );
-
-    return (
-      <div className="flex flex-col items-center">
-        <div className={`w-52 shrink-0 rounded-md border-2 bg-white p-2 dark:bg-zinc-950 ${colors.border}`}>
-          <div className="flex items-center justify-between gap-1">
-            <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${colors.badge}`}>
-              {node.section}
-            </span>
-            {node.tier === "expansion" && (
-              <span className="text-[10px] text-zinc-400">expansion</span>
-            )}
-          </div>
-          <p className="mt-1 text-sm font-medium text-black dark:text-zinc-50">{node.title}</p>
-
-          {canEditAssignments ? (
-            <AssignSelect positionKey={key} positionCode={node.code} customPositionId={null} />
-          ) : (
-            <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
-              {assignedStaff?.name ?? "Vacant"}
-            </p>
-          )}
-
-          {isUnqualified && assignedStaff && (
-            <p className="mt-1 flex items-center gap-1 text-[11px] text-amber-700 dark:text-amber-500">
-              ⚠ not marked qualified
-            </p>
-          )}
-        </div>
-
-        {visibleChildren.length > 0 && (
-          <>
-            {/* stub connecting this box down to the children's shared rail */}
-            <div className="h-4 w-px bg-black/15 dark:bg-white/15" />
-
-            <div className="flex">
-              {visibleChildren.map((child, i) => (
-                <div key={child.code} className="flex flex-col items-center px-3">
-                  {/* rail segment: full width for interior children, half width
-                      (toward center) for the first/last so the line only spans
-                      from the first child's center to the last child's center */}
-                  <div className="relative h-px w-full bg-black/15 dark:bg-white/15">
-                    {i === 0 && (
-                      <div className="absolute inset-y-0 left-0 w-1/2 bg-zinc-50 dark:bg-black" />
-                    )}
-                    {i === visibleChildren.length - 1 && (
-                      <div className="absolute inset-y-0 right-0 w-1/2 bg-zinc-50 dark:bg-black" />
-                    )}
-                  </div>
-                  <div className="h-4 w-px bg-black/15 dark:bg-white/15" />
-                  <PositionCard node={child} />
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-    );
-  }
+  const ctx: ChartContext = {
+    canEditAssignments,
+    assignmentByPosition,
+    staffById,
+    qualifiedSet,
+    collapsibleCodes,
+    collapsed,
+    showExpansion,
+    staff,
+    pending,
+    onAssign: handleAssign,
+    onToggleCollapsed: toggleCollapsed,
+  };
 
   return (
     <div className="space-y-8">
@@ -275,7 +388,7 @@ export function OrgChart({
               value={newStaffName}
               onChange={(e) => setNewStaffName(e.target.value)}
               placeholder="Add staff member (name)"
-              className="w-48 rounded-md border border-black/10 bg-transparent px-2 py-1 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30"
+              className="w-48 rounded-md border border-black/10 bg-transparent px-2 py-1 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]"
             />
             <button
               type="submit"
@@ -287,13 +400,39 @@ export function OrgChart({
         )}
       </div>
 
-      <div className="overflow-x-auto pb-4">
-        <div className="flex gap-6">
-          {tree.map((root) => (
-            <PositionCard key={root.code} node={root} />
-          ))}
+      {ic && (
+        <div className="flex flex-col items-center gap-2">
+          <PositionBox ctx={ctx} node={ic} />
+
+          {commandStaff.length > 0 && (
+            <>
+              <div className="h-3 w-px bg-black/15 dark:bg-white/15" />
+              <div className="grid grid-cols-2 gap-3">
+                {commandStaff.map((node) => (
+                  <PositionBox key={node.code} ctx={ctx} node={node} />
+                ))}
+              </div>
+            </>
+          )}
+
+          {sectionChiefs.length > 0 && (
+            <>
+              <div className="h-4 w-px bg-black/15 dark:bg-white/15" />
+              <div className="w-full overflow-x-auto pb-4">
+                {/* mx-auto centers when content fits, same as justify-center
+                    would -- but unlike justify-center on the scroll
+                    container, it doesn't trap part of an overflowing row
+                    before the scroll origin where it can't be reached. */}
+                <div className="mx-auto flex w-max gap-6">
+                  {sectionChiefs.map((node) => (
+                    <SectionChiefColumn key={node.code} ctx={ctx} node={node} />
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
-      </div>
+      )}
 
       <section className="space-y-3 border-t border-black/10 pt-6 dark:border-white/10">
         <div className="flex items-center justify-between">
@@ -306,7 +445,7 @@ export function OrgChart({
                 value={newPositionTitle}
                 onChange={(e) => setNewPositionTitle(e.target.value)}
                 placeholder="New position title"
-                className="w-48 rounded-md border border-black/10 bg-transparent px-2 py-1 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30"
+                className="w-48 rounded-md border border-black/10 bg-transparent px-2 py-1 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]"
               />
               <button
                 type="submit"
@@ -339,7 +478,7 @@ export function OrgChart({
                     {cp.title}
                   </p>
                   {canEditAssignments ? (
-                    <AssignSelect positionKey={key} positionCode={null} customPositionId={cp.id} />
+                    <AssignSelect ctx={ctx} positionKey={key} positionCode={null} customPositionId={cp.id} />
                   ) : (
                     <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
                       {assignedStaff?.name ?? "Vacant"}

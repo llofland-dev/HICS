@@ -23,7 +23,7 @@ function now() {
 }
 
 function fieldClass() {
-  return "w-full rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30";
+  return "w-full rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]";
 }
 
 interface NewLogForm {
@@ -103,7 +103,7 @@ export function UnitLogsPanel({
           {!showNew ? (
             <button
               onClick={() => setShowNew(true)}
-              className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
+              className="rounded-md bg-[#00274c] px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#001a35]"
             >
               New unit log
             </button>
@@ -215,7 +215,7 @@ export function UnitLogsPanel({
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background transition-colors hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                  className="rounded-md bg-[#00274c] px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#001a35] disabled:opacity-50"
                 >
                   {submitting ? "Creating..." : "Create log"}
                 </button>
@@ -486,7 +486,7 @@ function UnitLogCard({
                 <button
                   type="submit"
                   disabled={addingResource}
-                  className="rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                  className="rounded-md bg-[#00274c] px-3 py-1 text-xs font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
                 >
                   Add
                 </button>
@@ -576,7 +576,7 @@ function UnitLogCard({
                 <button
                   type="submit"
                   disabled={addingEntry}
-                  className="rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                  className="rounded-md bg-[#00274c] px-3 py-1 text-xs font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
                 >
                   Add entry
                 </button>
@@ -634,7 +634,7 @@ function UnitLogCard({
                 <button
                   type="submit"
                   disabled={preparing}
-                  className="rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                  className="rounded-md bg-[#00274c] px-3 py-1 text-xs font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
                 >
                   {preparing ? "Saving..." : "Sign"}
                 </button>

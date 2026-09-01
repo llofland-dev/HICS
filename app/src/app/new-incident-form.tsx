@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { IncidentType } from "@/lib/supabase/types";
+import { BRAND } from "@/lib/brand";
 
 export function NewIncidentForm({ facilityOrgId }: { facilityOrgId: string }) {
   const router = useRouter();
@@ -66,7 +67,7 @@ export function NewIncidentForm({ facilityOrgId }: { facilityOrgId: string }) {
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-56 rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30"
+          className="w-56 rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]"
           placeholder="e.g. Regional flooding response"
         />
       </div>
@@ -81,7 +82,7 @@ export function NewIncidentForm({ facilityOrgId }: { facilityOrgId: string }) {
           required
           value={incidentDate}
           onChange={(e) => setIncidentDate(e.target.value)}
-          className="rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30"
+          className="rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]"
         />
       </div>
 
@@ -93,7 +94,7 @@ export function NewIncidentForm({ facilityOrgId }: { facilityOrgId: string }) {
           id="incident-type"
           value={type}
           onChange={(e) => setType(e.target.value as IncidentType)}
-          className="rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30"
+          className="rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]"
         >
           <option value="incident">Incident</option>
           <option value="exercise">Exercise</option>
@@ -101,11 +102,7 @@ export function NewIncidentForm({ facilityOrgId }: { facilityOrgId: string }) {
         </select>
       </div>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background transition-colors hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
-      >
+      <button type="submit" disabled={submitting} className={BRAND.buttonClassSm}>
         {submitting ? "Creating..." : "New incident"}
       </button>
 

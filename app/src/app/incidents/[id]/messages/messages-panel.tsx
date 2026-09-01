@@ -46,7 +46,7 @@ function emptyForm(): NewMessageForm {
 }
 
 function fieldClass() {
-  return "w-full rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30";
+  return "w-full rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]";
 }
 
 export function MessagesPanel({ incidentId, incidentName, positions, messages, canEdit }: MessagesPanelProps) {
@@ -95,7 +95,7 @@ export function MessagesPanel({ incidentId, incidentName, positions, messages, c
           {!showNew ? (
             <button
               onClick={() => setShowNew(true)}
-              className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
+              className="rounded-md bg-[#00274c] px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#001a35]"
             >
               New message
             </button>
@@ -211,7 +211,7 @@ export function MessagesPanel({ incidentId, incidentName, positions, messages, c
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background transition-colors hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                  className="rounded-md bg-[#00274c] px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#001a35] disabled:opacity-50"
                 >
                   {submitting ? "Sending..." : "Send"}
                 </button>
@@ -395,7 +395,7 @@ function MessageCard({ message, canEdit }: { message: Message; canEdit: boolean 
                 <button
                   type="submit"
                   disabled={approving}
-                  className="rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                  className="rounded-md bg-[#00274c] px-3 py-1 text-xs font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
                 >
                   {approving ? "Saving..." : "Approve"}
                 </button>
@@ -461,7 +461,7 @@ function MessageCard({ message, canEdit }: { message: Message; canEdit: boolean 
                 <button
                   type="submit"
                   disabled={replying}
-                  className="rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                  className="rounded-md bg-[#00274c] px-3 py-1 text-xs font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
                 >
                   {replying ? "Saving..." : "Send reply"}
                 </button>

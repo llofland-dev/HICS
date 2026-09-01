@@ -10,6 +10,7 @@ import type {
   AarCommandHighlight,
   AarCoordinationRole,
   AarCoreElementNote,
+  AarTimelineEntry,
   CoreElement,
   UnitLogEntry,
 } from "@/lib/supabase/types";
@@ -27,12 +28,13 @@ interface AarEditorProps {
   coreElementNotes: AarCoreElementNote[];
   commandHighlights: AarCommandHighlight[];
   coordinationRoles: AarCoordinationRole[];
-  timeline: (UnitLogEntry & { unit_name: string })[];
+  timelineEntries: AarTimelineEntry[];
+  importableEntries: (UnitLogEntry & { unit_name: string })[];
   canEdit: boolean;
 }
 
 function fieldClass() {
-  return "w-full rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30";
+  return "w-full rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]";
 }
 
 function today() {
@@ -60,7 +62,8 @@ export function AarEditor({
   coreElementNotes,
   commandHighlights,
   coordinationRoles,
-  timeline,
+  timelineEntries,
+  importableEntries,
   canEdit,
 }: AarEditorProps) {
   return (
@@ -85,7 +88,12 @@ export function AarEditor({
         canEdit={canEdit}
       />
 
-      <TimelinePreview incidentId={incidentId} timeline={timeline} />
+      <TimelineEditor
+        incidentId={incidentId}
+        entries={timelineEntries}
+        importableEntries={importableEntries}
+        canEdit={canEdit}
+      />
 
       <ImprovementMatrixSection incidentId={incidentId} items={actionItems} canEdit={canEdit} />
 
@@ -245,7 +253,7 @@ function HeaderSection({
           <button
             type="submit"
             disabled={saving}
-            className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+            className="rounded-md bg-[#00274c] px-4 py-1.5 text-sm font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save"}
           </button>
@@ -377,7 +385,7 @@ function CoreElementBlock({
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                className="rounded-md bg-[#00274c] px-3 py-1 text-xs font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
               >
                 Add
               </button>
@@ -438,7 +446,7 @@ function EditableTextareaSection({
             <button
               type="submit"
               disabled={saving}
-              className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+              className="rounded-md bg-[#00274c] px-4 py-1.5 text-sm font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
             >
               {saving ? "Saving..." : "Save"}
             </button>
@@ -518,7 +526,7 @@ function CommandStructureSection({
             <button
               type="submit"
               disabled={savingNarrative}
-              className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+              className="rounded-md bg-[#00274c] px-4 py-1.5 text-sm font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
             >
               Save
             </button>
@@ -632,7 +640,7 @@ function HighlightList({
             <button
               type="submit"
               disabled={saving}
-              className="shrink-0 rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+              className="shrink-0 rounded-md bg-[#00274c] px-3 py-1 text-xs font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
             >
               Add
             </button>
@@ -753,7 +761,7 @@ function CoordinationRolesList({
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                className="rounded-md bg-[#00274c] px-3 py-1 text-xs font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
               >
                 Add
               </button>
@@ -778,49 +786,281 @@ function CoordinationRolesList({
   );
 }
 
-function TimelinePreview({
+function TimelineEditor({
   incidentId,
-  timeline,
+  entries,
+  importableEntries,
+  canEdit,
 }: {
   incidentId: string;
-  timeline: (UnitLogEntry & { unit_name: string })[];
+  entries: AarTimelineEntry[];
+  importableEntries: (UnitLogEntry & { unit_name: string })[];
+  canEdit: boolean;
 }) {
+  const router = useRouter();
+  const supabase = createClient();
+
+  const importedIds = new Set(entries.map((e) => e.source_unit_log_entry_id).filter(Boolean));
+  const pendingImport = importableEntries.filter((e) => !importedIds.has(e.id));
+
+  const [importing, setImporting] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  async function handleImport() {
+    if (pendingImport.length === 0) return;
+    setImporting(true);
+    await supabase.from("aar_timeline_entries").insert(
+      pendingImport.map((e) => ({
+        incident_id: incidentId,
+        entry_date: e.entry_date,
+        entry_time: e.entry_time,
+        description: `${e.unit_name}: ${e.notable_activity}`,
+        source_unit_log_entry_id: e.id,
+      }))
+    );
+    setImporting(false);
+    router.refresh();
+  }
+
+  async function handleDelete(id: string) {
+    await supabase.from("aar_timeline_entries").delete().eq("id", id);
+    router.refresh();
+  }
+
   return (
     <SectionShell title="Incident Timeline">
       <p className="text-xs text-zinc-500">
-        Auto-populated from ICS 214 unit activity logs — add or edit entries on the{" "}
+        A curated timeline for this report — separate from the raw{" "}
         <Link href={`/incidents/${incidentId}/unit-logs`} className="underline">
-          unit logs page
+          ICS 214 unit logs
         </Link>
-        .
+        . Pull in new activity, then clean up wording, add day/phase labels, or add entries (like
+        Command stand-up/stand-down) that never lived in a specific unit&apos;s log.
       </p>
-      {timeline.length === 0 ? (
-        <p className="text-sm text-zinc-500">No unit log entries yet.</p>
+
+      {canEdit && (
+        <button
+          onClick={handleImport}
+          disabled={importing || pendingImport.length === 0}
+          className="rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10 disabled:opacity-50"
+        >
+          {importing
+            ? "Importing..."
+            : pendingImport.length === 0
+              ? "No new unit log entries to import"
+              : `Import ${pendingImport.length} new entr${pendingImport.length === 1 ? "y" : "ies"} from unit logs`}
+        </button>
+      )}
+
+      {entries.length === 0 ? (
+        <p className="text-sm text-zinc-500">No timeline entries yet.</p>
       ) : (
         <div className="overflow-x-auto">
-        <table className="w-full min-w-[480px] text-left text-xs">
-          <thead className="text-zinc-500">
-            <tr>
-              <th className="w-32 py-1 pr-3 font-medium">Date/Time</th>
-              <th className="w-40 py-1 pr-3 font-medium">Unit</th>
-              <th className="py-1 pr-3 font-medium">Notable Activity</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-black/5 dark:divide-white/5">
-            {timeline.map((e) => (
-              <tr key={e.id}>
-                <td className="py-1 pr-3 align-top text-zinc-500">
-                  {e.entry_date} {e.entry_time}
-                </td>
-                <td className="py-1 pr-3 align-top text-zinc-500">{e.unit_name}</td>
-                <td className="py-1 pr-3 text-black dark:text-zinc-50">{e.notable_activity}</td>
+          <table className="w-full min-w-[560px] text-left text-xs">
+            <thead className="text-zinc-500">
+              <tr>
+                <th className="w-36 py-1 pr-3 font-medium">Time</th>
+                <th className="w-32 py-1 pr-3 font-medium">Phase</th>
+                <th className="py-1 pr-3 font-medium">Update / Action</th>
+                {canEdit && <th className="w-20 py-1 font-medium" />}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-black/5 dark:divide-white/5">
+              {entries.map((e) =>
+                editingId === e.id ? (
+                  <TimelineRowEditor key={e.id} entry={e} onDone={() => setEditingId(null)} />
+                ) : (
+                  <tr key={e.id}>
+                    <td className="py-1 pr-3 align-top text-zinc-500">
+                      {e.entry_date} {e.entry_time}
+                    </td>
+                    <td className="py-1 pr-3 align-top text-zinc-500">{e.phase ?? "—"}</td>
+                    <td className="py-1 pr-3 align-top text-black dark:text-zinc-50">
+                      {e.description}
+                    </td>
+                    {canEdit && (
+                      <td className="py-1 align-top">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setEditingId(e.id)}
+                            className="text-zinc-400 hover:text-black dark:hover:text-zinc-50"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(e.id)}
+                            className="text-zinc-400 hover:text-red-600 dark:hover:text-red-400"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
         </div>
       )}
+
+      {canEdit &&
+        (showAdd ? (
+          <TimelineAddForm incidentId={incidentId} onDone={() => setShowAdd(false)} />
+        ) : (
+          <button
+            onClick={() => setShowAdd(true)}
+            className="rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+          >
+            Add entry
+          </button>
+        ))}
     </SectionShell>
+  );
+}
+
+function TimelineAddForm({ incidentId, onDone }: { incidentId: string; onDone: () => void }) {
+  const router = useRouter();
+  const supabase = createClient();
+
+  const [date, setDate] = useState(today());
+  const [time, setTime] = useState("");
+  const [phase, setPhase] = useState("");
+  const [description, setDescription] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  async function handleAdd(e: React.FormEvent) {
+    e.preventDefault();
+    if (!description.trim() || !time) return;
+    setSaving(true);
+    await supabase.from("aar_timeline_entries").insert({
+      incident_id: incidentId,
+      entry_date: date,
+      entry_time: time,
+      phase: phase.trim() || null,
+      description: description.trim(),
+    });
+    setSaving(false);
+    onDone();
+    router.refresh();
+  }
+
+  return (
+    <form onSubmit={handleAdd} className="space-y-2 rounded-md border border-black/10 p-3 dark:border-white/10">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <input
+          type="date"
+          required
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className={fieldClass()}
+        />
+        <input
+          type="time"
+          required
+          value={time}
+          onChange={(e) => setTime(e.target.value)}
+          className={fieldClass()}
+        />
+        <input
+          value={phase}
+          onChange={(e) => setPhase(e.target.value)}
+          placeholder="Phase (e.g. Day 1 - 6/24)"
+          className={`${fieldClass()} sm:col-span-2`}
+        />
+      </div>
+      <input
+        required
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        placeholder="Update / action"
+        className={fieldClass()}
+      />
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          disabled={saving}
+          className="rounded-md bg-[#00274c] px-3 py-1 text-xs font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          onClick={onDone}
+          className="rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function TimelineRowEditor({ entry, onDone }: { entry: AarTimelineEntry; onDone: () => void }) {
+  const router = useRouter();
+  const supabase = createClient();
+
+  const [date, setDate] = useState(entry.entry_date);
+  const [time, setTime] = useState(entry.entry_time.slice(0, 5));
+  const [phase, setPhase] = useState(entry.phase ?? "");
+  const [description, setDescription] = useState(entry.description);
+  const [saving, setSaving] = useState(false);
+
+  async function handleSave() {
+    if (!description.trim() || !time) return;
+    setSaving(true);
+    await supabase
+      .from("aar_timeline_entries")
+      .update({
+        entry_date: date,
+        entry_time: time,
+        phase: phase.trim() || null,
+        description: description.trim(),
+      })
+      .eq("id", entry.id);
+    setSaving(false);
+    onDone();
+    router.refresh();
+  }
+
+  return (
+    <tr>
+      <td className="py-1 pr-3 align-top">
+        <div className="flex flex-col gap-1">
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={fieldClass()} />
+          <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className={fieldClass()} />
+        </div>
+      </td>
+      <td className="py-1 pr-3 align-top">
+        <input value={phase} onChange={(e) => setPhase(e.target.value)} className={fieldClass()} />
+      </td>
+      <td className="py-1 pr-3 align-top">
+        <textarea
+          rows={2}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className={fieldClass()}
+        />
+      </td>
+      <td className="py-1 align-top">
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="rounded-md bg-[#00274c] px-2 py-1 text-xs font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
+          >
+            Save
+          </button>
+          <button
+            onClick={onDone}
+            className="rounded-md border border-black/10 px-2 py-1 text-xs dark:border-white/10"
+          >
+            Cancel
+          </button>
+        </div>
+      </td>
+    </tr>
   );
 }
 
@@ -948,7 +1188,7 @@ function ImprovementMatrixSection({
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                className="rounded-md bg-[#00274c] px-3 py-1 text-xs font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
               >
                 Add
               </button>
@@ -1038,7 +1278,7 @@ function PreparedBySection({
             <button
               type="submit"
               disabled={saving}
-              className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+              className="rounded-md bg-[#00274c] px-4 py-1.5 text-sm font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
             >
               Save
             </button>
