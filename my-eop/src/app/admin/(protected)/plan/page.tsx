@@ -20,7 +20,7 @@ export default async function AdminPlanPage() {
   const [{ data: sections }, { data: pages }] = await Promise.all([
     supabase
       .from("plan_sections")
-      .select("id, org_id, title, color_key, category, sort_order, created_at")
+      .select("id, org_id, title, color_key, icon_path, category, sort_order, created_at")
       .eq("org_id", profile.org_id)
       .order("sort_order")
       .returns<PlanSection[]>(),

@@ -12,7 +12,20 @@ export interface CategoryItem {
   href: string;
   label: string;
   sublabel: string | null;
+  iconUrl: string | null;
   color: PaletteColor;
+}
+
+// Narrow, generic-free shape so this works with both the anon client and
+// the service-role admin client — their full SupabaseClient<...> generic
+// signatures don't unify, but getPublicUrl is a pure string builder that
+// doesn't care which client instance calls it. Same pattern as orgLogoUrl
+// in src/lib/eop-org.ts.
+type StorageOnly = { storage: { from: (bucket: string) => { getPublicUrl: (path: string) => { data: { publicUrl: string } } } } };
+
+function sectionIconUrl(supabase: StorageOnly, iconPath: string | null): string | null {
+  if (!iconPath) return null;
+  return supabase.storage.from("section-icons").getPublicUrl(iconPath).data.publicUrl;
 }
 
 export async function fetchCategoryContent(
@@ -23,7 +36,7 @@ export async function fetchCategoryContent(
   const [{ data: allSections }, { data: allChecklists }] = await Promise.all([
     admin
       .from("plan_sections")
-      .select("id, org_id, title, color_key, category, subcategory, sort_order, created_at")
+      .select("id, org_id, title, color_key, icon_path, category, subcategory, sort_order, created_at")
       .eq("org_id", orgId)
       .order("sort_order")
       .returns<PlanSection[]>(),
@@ -49,7 +62,8 @@ export function buildCategoryTopItems(
   categoryKey: string,
   allSections: PlanSection[],
   sections: PlanSection[],
-  checklists: Checklist[]
+  checklists: Checklist[],
+  supabase?: StorageOnly
 ): CategoryItem[] {
   const items: CategoryItem[] = [];
   const groupLabels: string[] = [];
@@ -65,6 +79,7 @@ export function buildCategoryTopItems(
       href: `/plan/${code}/sections/${section.id}`,
       label: section.title,
       sublabel: null,
+      iconUrl: supabase ? sectionIconUrl(supabase, section.icon_path) : null,
       color: colorForSection(section, index),
     });
   }
@@ -79,6 +94,7 @@ export function buildCategoryTopItems(
       href: `/plan/${code}/checklists/${checklist.id}`,
       label: checklist.title,
       sublabel: checklist.category,
+      iconUrl: null,
       color: colorForIndex(items.length),
     });
   }
@@ -89,6 +105,7 @@ export function buildCategoryTopItems(
       href: `/plan/${code}/categories/${categoryKey}/${encodeURIComponent(label)}`,
       label,
       sublabel: null,
+      iconUrl: null,
       color: colorForIndex(items.length),
     });
   }
@@ -102,7 +119,8 @@ export function buildSubcategoryItems(
   allSections: PlanSection[],
   sections: PlanSection[],
   checklists: Checklist[],
-  subcategory: string
+  subcategory: string,
+  supabase?: StorageOnly
 ): CategoryItem[] {
   const items: CategoryItem[] = [];
 
@@ -113,6 +131,7 @@ export function buildSubcategoryItems(
       href: `/plan/${code}/sections/${section.id}`,
       label: section.title,
       sublabel: null,
+      iconUrl: supabase ? sectionIconUrl(supabase, section.icon_path) : null,
       color: colorForSection(section, index),
     });
   }
@@ -123,6 +142,7 @@ export function buildSubcategoryItems(
       href: `/plan/${code}/checklists/${checklist.id}`,
       label: checklist.title,
       sublabel: checklist.category,
+      iconUrl: null,
       color: colorForIndex(items.length),
     });
   }

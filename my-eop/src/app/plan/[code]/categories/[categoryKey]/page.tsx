@@ -22,7 +22,7 @@ export default async function CategoryPage({
 
   const admin = createAdminClient();
   const { allSections, sections, checklists } = await fetchCategoryContent(admin, org.id, categoryKey);
-  const items = buildCategoryTopItems(code, categoryKey, allSections, sections, checklists);
+  const items = buildCategoryTopItems(code, categoryKey, allSections, sections, checklists, admin);
 
   if (items.length === 1) {
     redirect(items[0].href);
@@ -41,9 +41,15 @@ export default async function CategoryPage({
                 href={item.href}
                 className={`flex min-h-16 items-center justify-between gap-3 rounded-xl px-4 py-3 font-medium text-zinc-800 transition-colors ${item.color.row} ${item.color.rowHover}`}
               >
-                <span>
-                  <span className="block">{item.label}</span>
-                  {item.sublabel && <span className="block text-xs font-normal text-zinc-600">{item.sublabel}</span>}
+                <span className="flex min-w-0 items-center gap-3">
+                  {item.iconUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={item.iconUrl} alt="" className="h-8 w-8 shrink-0 rounded object-cover" />
+                  )}
+                  <span className="min-w-0">
+                    <span className="block truncate">{item.label}</span>
+                    {item.sublabel && <span className="block text-xs font-normal text-zinc-600">{item.sublabel}</span>}
+                  </span>
                 </span>
                 <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${item.color.button} ${item.color.buttonText}`}>
                   <ChevronRightIcon className="h-5 w-5" />

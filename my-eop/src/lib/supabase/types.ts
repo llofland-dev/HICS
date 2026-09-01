@@ -22,6 +22,7 @@ export interface PlanSection {
   org_id: string;
   title: string;
   color_key: string | null;
+  icon_path: string | null;
   category: string | null;
   subcategory: string | null;
   sort_order: number;

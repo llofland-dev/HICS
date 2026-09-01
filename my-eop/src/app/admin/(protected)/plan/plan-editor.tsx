@@ -33,6 +33,7 @@ export function PlanEditor({
   const [editingSectionTitle, setEditingSectionTitle] = useState("");
   const [editingSectionColor, setEditingSectionColor] = useState("");
   const [editingSectionCategory, setEditingSectionCategory] = useState(CATEGORIES[0].key);
+  const [uploadingIconId, setUploadingIconId] = useState<string | null>(null);
 
   const [newPage, setNewPage] = useState({ title: "", body: "" });
   const [editingPageId, setEditingPageId] = useState<string | null>(null);
@@ -90,6 +91,38 @@ export function PlanEditor({
     if (error) return setError(error.message);
     setEditingSectionId(null);
     router.refresh();
+  }
+
+  function handleIconChange(section: PlanSection) {
+    return async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      e.target.value = "";
+      if (!file) return;
+
+      setUploadingIconId(section.id);
+      setError(null);
+
+      const ext = file.name.split(".").pop() || "png";
+      // Unique filename per upload so the public URL changes and no screen
+      // serves a browser-cached copy of the old icon at the same URL.
+      const path = `${orgId}/${section.id}/icon-${Date.now()}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("section-icons")
+        .upload(path, file, { contentType: file.type });
+
+      if (uploadError) {
+        setUploadingIconId(null);
+        setError(uploadError.message);
+        return;
+      }
+
+      const { error } = await supabase.from("plan_sections").update({ icon_path: path }).eq("id", section.id);
+
+      setUploadingIconId(null);
+      if (error) return setError(error.message);
+      router.refresh();
+    };
   }
 
   async function deleteSection(section: PlanSection) {
@@ -206,6 +239,30 @@ export function PlanEditor({
                       </option>
                     ))}
                   </select>
+                  <div className="flex items-center gap-2">
+                    {section.icon_path && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={supabase.storage.from("section-icons").getPublicUrl(section.icon_path).data.publicUrl}
+                        alt=""
+                        className="h-8 w-8 shrink-0 rounded object-cover"
+                      />
+                    )}
+                    <label className="cursor-pointer rounded-md border border-black/10 px-2 py-1 text-xs hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/10">
+                      {uploadingIconId === section.id
+                        ? "Uploading..."
+                        : section.icon_path
+                          ? "Replace icon"
+                          : "Upload icon"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleIconChange(section)}
+                        disabled={uploadingIconId === section.id}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
                   <div className="flex gap-1.5">
                     <button
                       onClick={() => renameSection(section.id)}
