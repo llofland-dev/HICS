@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { SectionShell } from "@/components/section-shell";
+import { BRAND } from "@/lib/brand";
 import type {
   Aar,
   AarActionItem,
@@ -39,15 +41,6 @@ function fieldClass() {
 
 function today() {
   return new Date().toISOString().slice(0, 10);
-}
-
-function SectionShell({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section className="space-y-3 rounded-lg border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-950">
-      <h2 className="text-sm font-semibold text-black dark:text-zinc-50">{title}</h2>
-      {children}
-    </section>
-  );
 }
 
 export function AarEditor({
@@ -205,7 +198,7 @@ function HeaderSection({
         {canEdit && (
           <button
             onClick={() => setEditing(true)}
-            className="rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+            className={BRAND.ghostButtonXs}
           >
             Edit
           </button>
@@ -401,7 +394,7 @@ function CoreElementBlock({
         ) : (
           <button
             onClick={() => setShowAdd(true)}
-            className="mt-2 rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+            className={`mt-2 ${BRAND.ghostButtonXs}`}
           >
             Add finding
           </button>
@@ -467,7 +460,7 @@ function EditableTextareaSection({
           {canEdit && (
             <button
               onClick={() => setEditing(true)}
-              className="rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+              className={BRAND.ghostButtonXs}
             >
               Edit
             </button>
@@ -547,7 +540,7 @@ function CommandStructureSection({
           {canEdit && (
             <button
               onClick={() => setEditingNarrative(true)}
-              className="rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+              className={BRAND.ghostButtonXs}
             >
               Edit
             </button>
@@ -655,7 +648,7 @@ function HighlightList({
         ) : (
           <button
             onClick={() => setShowAdd(true)}
-            className="mt-2 rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+            className={`mt-2 ${BRAND.ghostButtonXs}`}
           >
             Add
           </button>
@@ -777,7 +770,7 @@ function CoordinationRolesList({
         ) : (
           <button
             onClick={() => setShowAdd(true)}
-            className="mt-2 rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+            className={`mt-2 ${BRAND.ghostButtonXs}`}
           >
             Add role
           </button>
@@ -843,7 +836,7 @@ function TimelineEditor({
         <button
           onClick={handleImport}
           disabled={importing || pendingImport.length === 0}
-          className="rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10 disabled:opacity-50"
+          className={`${BRAND.ghostButtonXs} disabled:opacity-50`}
         >
           {importing
             ? "Importing..."
@@ -911,7 +904,7 @@ function TimelineEditor({
         ) : (
           <button
             onClick={() => setShowAdd(true)}
-            className="rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+            className={BRAND.ghostButtonXs}
           >
             Add entry
           </button>
@@ -1204,7 +1197,7 @@ function ImprovementMatrixSection({
         ) : (
           <button
             onClick={() => setShowAdd(true)}
-            className="mt-2 rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+            className={`mt-2 ${BRAND.ghostButtonXs}`}
           >
             Add row
           </button>
@@ -1302,7 +1295,7 @@ function PreparedBySection({
           {canEdit && (
             <button
               onClick={() => setEditing(true)}
-              className="rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+              className={BRAND.ghostButtonXs}
             >
               Edit
             </button>

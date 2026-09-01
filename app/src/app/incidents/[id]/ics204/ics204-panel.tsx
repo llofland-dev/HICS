@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { BRAND } from "@/lib/brand";
+import { SECTION_COLORS } from "@/lib/section-colors";
 import type {
   Ics204AssignmentList,
   Ics204Objective,
@@ -310,13 +312,17 @@ function AssignmentListCard({
     router.refresh();
   }
 
+  const colors = SECTION_COLORS[list.section];
+
   return (
-    <div className="overflow-hidden rounded-lg border border-black/10 bg-white text-sm dark:border-white/10 dark:bg-zinc-950">
+    <div
+      className={`overflow-hidden rounded-lg border border-l-4 border-black/10 bg-white text-sm dark:border-white/10 ${colors.border} dark:bg-zinc-950`}
+    >
       <div className="grid grid-cols-1 divide-y divide-black/10 border-b border-black/10 sm:grid-cols-2 sm:divide-x sm:divide-y-0 dark:divide-white/10 dark:border-white/10">
         <div className="px-3 py-2">
           <span className="block text-xs font-medium text-zinc-500">Section</span>
           <p className="text-black dark:text-zinc-50">
-            {list.section}
+            <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${colors.badge}`}>{list.section}</span>
             {list.section_chief_name && ` · ${list.section_chief_name}`}
           </p>
         </div>
@@ -426,7 +432,7 @@ function AssignmentListCard({
           ) : (
             <button
               onClick={() => setShowAddObjective(true)}
-              className="mt-2 rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+              className={`mt-2 ${BRAND.ghostButtonXs}`}
             >
               Add objective
             </button>
@@ -511,7 +517,7 @@ function AssignmentListCard({
           ) : (
             <button
               onClick={() => setShowAddUnit(true)}
-              className="mt-2 rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+              className={`mt-2 ${BRAND.ghostButtonXs}`}
             >
               Add unit
             </button>
@@ -553,7 +559,7 @@ function AssignmentListCard({
             {canEdit && (
               <button
                 onClick={() => setEditingSpecial(true)}
-                className="shrink-0 rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+                className={`shrink-0 ${BRAND.ghostButtonXs}`}
               >
                 Edit
               </button>
@@ -613,7 +619,7 @@ function AssignmentListCard({
           ) : (
             <button
               onClick={() => setShowPrepared(true)}
-              className="mt-1 rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+              className={`mt-1 ${BRAND.ghostButtonXs}`}
             >
               Sign as prepared by
             </button>

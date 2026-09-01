@@ -13,6 +13,8 @@ export const BRAND = {
     "rounded-md bg-[#00274c] px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#001a35] disabled:opacity-50",
   secondaryButtonClassSm:
     "rounded-md border border-[#00274c]/30 px-3 py-1.5 text-sm font-medium text-[#00274c] transition-colors hover:bg-[#00274c]/5 dark:border-[#7ba6d6]/40 dark:text-[#7ba6d6] dark:hover:bg-[#7ba6d6]/10",
+  ghostButtonXs:
+    "rounded-md border border-[#00274c]/30 bg-[#00274c]/5 px-3 py-1 text-xs font-medium text-[#00274c] transition-colors hover:bg-[#00274c]/10 dark:border-[#7ba6d6]/30 dark:bg-[#7ba6d6]/10 dark:text-[#7ba6d6] dark:hover:bg-[#7ba6d6]/20",
   focusBorder: "focus:border-[#00274c] dark:focus:border-[#7ba6d6]",
   link: "text-[#00274c] hover:underline dark:text-[#7ba6d6]",
 };

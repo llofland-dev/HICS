@@ -3,19 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { SectionShell } from "@/components/section-shell";
+import { BRAND } from "@/lib/brand";
 import type { Ics215aAnalysis, Ics215aHazard } from "@/lib/supabase/types";
 
 function fieldClass() {
   return "w-full rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]";
-}
-
-function SectionShell({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section className="space-y-3 rounded-lg border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-950">
-      <h2 className="text-sm font-semibold text-black dark:text-zinc-50">{title}</h2>
-      {children}
-    </section>
-  );
 }
 
 interface Ics215aPanelProps {
@@ -262,7 +255,7 @@ function HazardsSection({
         ) : (
           <button
             onClick={() => setShowAdd(true)}
-            className="rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+            className={BRAND.ghostButtonXs}
           >
             Add hazard
           </button>
@@ -364,7 +357,7 @@ function SignOffSection({
           {canEdit && (
             <button
               onClick={() => setEditing(true)}
-              className="rounded-md border border-black/10 px-3 py-1 text-xs dark:border-white/10"
+              className={BRAND.ghostButtonXs}
             >
               Edit
             </button>
