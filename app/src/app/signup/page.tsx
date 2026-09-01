@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { BRAND } from "@/lib/brand";
 
 export default function SignUpPage() {
   const supabase = createClient();
@@ -11,6 +13,7 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [facilityCode, setFacilityCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -20,10 +23,12 @@ export default function SignUpPage() {
     setError(null);
     setLoading(true);
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { first_name: firstName, last_name: lastName } },
+      options: {
+        data: { first_name: firstName, last_name: lastName, facility_code: facilityCode },
+      },
     });
 
     setLoading(false);
@@ -31,6 +36,17 @@ export default function SignUpPage() {
     if (error) {
       setError(error.message);
       return;
+    }
+
+    // Best-effort: tells the right admin (Super Admin for a brand-new
+    // facility, or that facility's own admin) that someone is waiting to be
+    // let in. Never blocks the "check your email" state on this succeeding.
+    if (data.user) {
+      fetch("/api/facility-signup-notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profileId: data.user.id }),
+      }).catch(() => {});
     }
 
     setSubmitted(true);
@@ -60,9 +76,14 @@ export default function SignUpPage() {
         onSubmit={handleSubmit}
         className="w-full max-w-sm space-y-4 rounded-lg border border-black/10 bg-white p-8 dark:border-white/10 dark:bg-zinc-950"
       >
-        <div>
-          <h1 className="text-xl font-semibold text-black dark:text-zinc-50">Create account</h1>
-          <p className="text-sm text-zinc-500">MEDICS</p>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className="rounded-xl bg-white p-2">
+            <Image src="/logo.png" alt="Emergency Preparedness Solutions" width={72} height={74} />
+          </div>
+          <div>
+            <h1 className="text-xl font-semibold text-black dark:text-zinc-50">Create account</h1>
+            <p className="text-sm text-zinc-500">MEDICS</p>
+          </div>
         </div>
 
         <div className="flex gap-3">
@@ -78,7 +99,7 @@ export default function SignUpPage() {
               required
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="w-full rounded-md border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30"
+              className="w-full rounded-md border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]"
             />
           </div>
 
@@ -94,7 +115,7 @@ export default function SignUpPage() {
               required
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="w-full rounded-md border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30"
+              className="w-full rounded-md border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]"
             />
           </div>
         </div>
@@ -109,7 +130,7 @@ export default function SignUpPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-md border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30"
+            className="w-full rounded-md border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]"
           />
         </div>
 
@@ -127,17 +148,28 @@ export default function SignUpPage() {
             minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-md border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30"
+            className="w-full rounded-md border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label
+            htmlFor="facility-code"
+            className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+          >
+            Facility code (leave blank if your organization is new to MEDICS)
+          </label>
+          <input
+            id="facility-code"
+            value={facilityCode}
+            onChange={(e) => setFacilityCode(e.target.value)}
+            className="w-full rounded-md border border-black/10 bg-transparent px-3 py-2 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]"
           />
         </div>
 
         {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background transition-colors hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
-        >
+        <button type="submit" disabled={loading} className={`w-full ${BRAND.buttonClass}`}>
           {loading ? "Creating account..." : "Create account"}
         </button>
 

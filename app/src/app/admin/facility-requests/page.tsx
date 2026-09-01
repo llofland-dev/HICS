@@ -1,9 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Organization, Profile } from "@/lib/supabase/types";
+import type { Profile } from "@/lib/supabase/types";
 import { TopBar } from "@/components/top-bar";
-import { AdminUsersPanel } from "./admin-users-panel";
+import { FacilityRequestsPanel } from "./facility-requests-panel";
 
-export default async function AdminPage() {
+export default async function FacilityRequestsPage() {
   const supabase = await createClient();
 
   const {
@@ -18,42 +18,39 @@ export default async function AdminPage() {
     .eq("id", user.id)
     .maybeSingle<Profile>();
 
-  if (profile?.role !== "facility_admin") {
+  if (profile?.role !== "system_admin") {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-black">
-        <TopBar title="Admin" backHref="/" />
+        <TopBar title="Facility requests" backHref="/" />
         <main className="mx-auto max-w-2xl px-6 py-8">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            You don&apos;t have access to this page. Only facility administrators can assign new
-            users to a facility.
+            You don&apos;t have access to this page. Only the Super Admin can approve new
+            facilities.
           </p>
         </main>
       </div>
     );
   }
 
-  const { data: facilityOrg } = await supabase
-    .from("organizations")
-    .select("id, name, type, parent_org_id, created_at")
-    .eq("id", profile.org_id!)
-    .maybeSingle<Organization>();
-
+  // Scoped by the profiles_select_new_facility_requests policy: org_id is
+  // null AND requested_org_id is null (didn't match any existing facility).
   const { data: pending } = await supabase
     .from("profiles")
-    .select("id, org_id, role, first_name, last_name, email")
+    .select("id, org_id, role, first_name, last_name, email, requested_org_code")
     .is("org_id", null)
+    .is("requested_org_id", null)
     .returns<Profile[]>();
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
       <TopBar
-        title="Pending users"
-        subtitle={`New sign-ups waiting to be assigned to ${facilityOrg?.name ?? "your facility"}.`}
+        title="Facility requests"
+        subtitle="New clients waiting for a facility to be created."
         backHref="/"
       />
 
       <main className="mx-auto max-w-2xl px-6 py-8">
-        <AdminUsersPanel pending={pending ?? []} facilityName={facilityOrg?.name ?? "your facility"} />
+        <FacilityRequestsPanel pending={pending ?? []} />
       </main>
     </div>
   );

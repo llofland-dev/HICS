@@ -29,13 +29,19 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isAuthRoute =
+  const isPublicRoute =
     request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/signup");
+    request.nextUrl.pathname.startsWith("/signup") ||
+    // Fires right after signUp(), before email confirmation -- no session
+    // exists yet by design. See supabase/migrations/20260830120000_facility_request_functions.sql.
+    request.nextUrl.pathname.startsWith("/api/facility-signup-notify");
 
-  if (!user && !isAuthRoute) {
+  if (!user && !isPublicRoute) {
+    const originalPath = request.nextUrl.pathname + request.nextUrl.search;
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    url.search = "";
+    url.searchParams.set("next", originalPath);
     return NextResponse.redirect(url);
   }
 

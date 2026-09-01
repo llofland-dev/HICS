@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Position, PositionSection, Staff, StaffQualification } from "@/lib/supabase/types";
 import { SECTION_COLORS } from "@/lib/section-colors";
+import { buildPositionTree, flattenInHierarchyOrder } from "@/lib/position-tree";
 
 interface StaffRosterProps {
   facilityOrgId: string;
@@ -48,15 +49,24 @@ export function StaffRoster({ facilityOrgId, staff, positions, qualifications }:
     return set;
   }, [qualifications]);
 
+  // Same tree the org chart builds, flattened depth-first (a Section Chief
+  // immediately followed by its own branches and their units) so the
+  // qualification checklist groups positions the same way the org chart
+  // visually does, instead of an unordered bag per section.
+  const tree = useMemo(() => buildPositionTree(positions), [positions]);
+
   const positionsBySection = useMemo(() => {
-    const visible = positions.filter((p) => showExpansionPositions || p.tier === "core");
+    const ordered = flattenInHierarchyOrder(
+      tree,
+      (node) => showExpansionPositions || node.tier === "core"
+    );
     const groups = new Map<PositionSection, Position[]>();
-    visible.forEach((p) => {
+    ordered.forEach((p) => {
       if (!groups.has(p.section)) groups.set(p.section, []);
       groups.get(p.section)!.push(p);
     });
     return groups;
-  }, [positions, showExpansionPositions]);
+  }, [tree, showExpansionPositions]);
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -169,7 +179,7 @@ export function StaffRoster({ facilityOrgId, staff, positions, qualifications }:
   }
 
   function fieldClass() {
-    return "rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30";
+    return "rounded-md border border-black/10 bg-transparent px-3 py-1.5 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]";
   }
 
   return (
@@ -226,7 +236,7 @@ export function StaffRoster({ facilityOrgId, staff, positions, qualifications }:
           <button
             type="submit"
             disabled={adding}
-            className="rounded-md bg-foreground px-4 py-1.5 text-sm font-medium text-background transition-colors hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+            className="rounded-md bg-[#00274c] px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#001a35] disabled:opacity-50"
           >
             {adding ? "Adding..." : "Add staff"}
           </button>
@@ -312,7 +322,7 @@ export function StaffRoster({ facilityOrgId, staff, positions, qualifications }:
                                 <button
                                   onClick={() => handleSaveEdit(s.id)}
                                   disabled={saving}
-                                  className="rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                                  className="rounded-md bg-[#00274c] px-3 py-1 text-xs font-medium text-white hover:bg-[#001a35] disabled:opacity-50"
                                 >
                                   {saving ? "Saving..." : "Save"}
                                 </button>

@@ -1,9 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Organization, Profile } from "@/lib/supabase/types";
 import { TopBar } from "@/components/top-bar";
-import { AdminUsersPanel } from "./admin-users-panel";
+import { ManageUsersPanel } from "./manage-users-panel";
 
-export default async function AdminPage() {
+export default async function ManageUsersPage() {
   const supabase = await createClient();
 
   const {
@@ -21,11 +21,11 @@ export default async function AdminPage() {
   if (profile?.role !== "facility_admin") {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-black">
-        <TopBar title="Admin" backHref="/" />
+        <TopBar title="Manage users" backHref="/" />
         <main className="mx-auto max-w-2xl px-6 py-8">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            You don&apos;t have access to this page. Only facility administrators can assign new
-            users to a facility.
+            You don&apos;t have access to this page. Only facility administrators can manage
+            users.
           </p>
         </main>
       </div>
@@ -38,22 +38,22 @@ export default async function AdminPage() {
     .eq("id", profile.org_id!)
     .maybeSingle<Organization>();
 
-  const { data: pending } = await supabase
+  const { data: members } = await supabase
     .from("profiles")
     .select("id, org_id, role, first_name, last_name, email")
-    .is("org_id", null)
+    .eq("org_id", profile.org_id!)
     .returns<Profile[]>();
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
       <TopBar
-        title="Pending users"
-        subtitle={`New sign-ups waiting to be assigned to ${facilityOrg?.name ?? "your facility"}.`}
+        title="Manage users"
+        subtitle={`Everyone currently in ${facilityOrg?.name ?? "your facility"}.`}
         backHref="/"
       />
 
       <main className="mx-auto max-w-2xl px-6 py-8">
-        <AdminUsersPanel pending={pending ?? []} facilityName={facilityOrg?.name ?? "your facility"} />
+        <ManageUsersPanel members={members ?? []} currentUserId={user.id} />
       </main>
     </div>
   );

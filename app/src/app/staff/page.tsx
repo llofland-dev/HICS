@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import type { Position, Profile, Staff, StaffQualification } from "@/lib/supabase/types";
+import { TopBar } from "@/components/top-bar";
 import { StaffRoster } from "./staff-roster";
 
 export default async function StaffPage() {
@@ -21,11 +21,7 @@ export default async function StaffPage() {
   if (!profile?.org_id) {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-black">
-        <header className="border-b border-black/10 px-6 py-4 dark:border-white/10">
-          <Link href="/" className="text-sm text-zinc-500 hover:underline">
-            ← Home
-          </Link>
-        </header>
+        <TopBar title="Staff Roster" backHref="/" />
         <main className="mx-auto max-w-4xl px-6 py-8">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             Your account isn&apos;t linked to a facility yet. Ask your system administrator to
@@ -60,15 +56,11 @@ export default async function StaffPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
-      <header className="border-b border-black/10 px-6 py-4 dark:border-white/10">
-        <Link href="/" className="text-sm text-zinc-500 hover:underline">
-          ← Home
-        </Link>
-        <h1 className="text-lg font-semibold text-black dark:text-zinc-50">Staff Roster</h1>
-        <p className="text-sm text-zinc-500">
-          Roster and qualification matrix for your facility.
-        </p>
-      </header>
+      <TopBar
+        title="Staff Roster"
+        subtitle="Roster and qualification matrix for your facility."
+        backHref="/"
+      />
 
       <main className="mx-auto max-w-5xl px-6 py-8">
         <StaffRoster

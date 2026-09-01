@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { AppRole, Profile } from "@/lib/supabase/types";
+import { BRAND } from "@/lib/brand";
+import { ROLE_LABELS } from "@/lib/roles";
 
 interface AdminUsersPanelProps {
   pending: Profile[];
@@ -61,15 +63,15 @@ export function AdminUsersPanel({ pending, facilityName }: AdminUsersPanelProps)
                   onChange={(e) =>
                     setRoleById((v) => ({ ...v, [p.id]: e.target.value as AppRole }))
                   }
-                  className="rounded-md border border-black/10 bg-transparent px-2 py-1 text-sm outline-none focus:border-black/30 dark:border-white/10 dark:focus:border-white/30"
+                  className="rounded-md border border-black/10 bg-transparent px-2 py-1 text-sm outline-none focus:border-[#00274c] dark:border-white/10 dark:focus:border-[#7ba6d6]"
                 >
-                  <option value="member">Member</option>
-                  <option value="facility_admin">Facility admin</option>
+                  <option value="member">{ROLE_LABELS.member}</option>
+                  <option value="facility_admin">{ROLE_LABELS.facility_admin}</option>
                 </select>
                 <button
                   onClick={() => handleAssign(p.id)}
                   disabled={pendingId === p.id}
-                  className="rounded-md bg-foreground px-3 py-1.5 text-sm font-medium text-background hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+                  className={BRAND.buttonClassSm}
                 >
                   {pendingId === p.id ? "Assigning..." : `Assign to ${facilityName}`}
                 </button>
