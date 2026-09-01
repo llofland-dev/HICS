@@ -56,18 +56,24 @@ export default async function Home() {
         actions={
           <>
             {org && (
-              <Link href="/staff" className="text-sm text-blue-100 hover:text-white hover:underline">
+              <Link
+                href="/staff"
+                className="rounded-md px-3 py-1.5 text-sm text-blue-100 transition-colors hover:bg-white/10 hover:text-white"
+              >
                 Staff roster
               </Link>
             )}
             {profile?.role === "facility_admin" && (
               <>
-                <Link href="/admin" className="text-sm text-blue-100 hover:text-white hover:underline">
+                <Link
+                  href="/admin"
+                  className="rounded-md px-3 py-1.5 text-sm text-blue-100 transition-colors hover:bg-white/10 hover:text-white"
+                >
                   Admin
                 </Link>
                 <Link
                   href="/admin/manage-users"
-                  className="text-sm text-blue-100 hover:text-white hover:underline"
+                  className="rounded-md px-3 py-1.5 text-sm text-blue-100 transition-colors hover:bg-white/10 hover:text-white"
                 >
                   Manage users
                 </Link>
@@ -76,7 +82,7 @@ export default async function Home() {
             {profile?.role === "system_admin" && (
               <Link
                 href="/admin/facility-requests"
-                className="text-sm text-blue-100 hover:text-white hover:underline"
+                className="rounded-md px-3 py-1.5 text-sm text-blue-100 transition-colors hover:bg-white/10 hover:text-white"
               >
                 Facility requests
               </Link>
