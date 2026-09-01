@@ -94,6 +94,25 @@ export default async function Home() {
           </p>
         ) : (
           <>
+            <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <div className="rounded-lg border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-950">
+                <p className="text-2xl font-semibold text-black dark:text-zinc-50">{incidents.length}</p>
+                <p className="text-xs text-zinc-500">Total incidents</p>
+              </div>
+              <div className="rounded-lg border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-950">
+                <p className="text-2xl font-semibold text-[#00274c] dark:text-[#7ba6d6]">
+                  {incidents.filter((i) => i.status === "active").length}
+                </p>
+                <p className="text-xs text-zinc-500">Active now</p>
+              </div>
+              <div className="hidden rounded-lg border border-black/10 bg-white p-4 sm:block dark:border-white/10 dark:bg-zinc-950">
+                <p className="text-2xl font-semibold text-zinc-400">
+                  {incidents.filter((i) => i.status === "closed").length}
+                </p>
+                <p className="text-xs text-zinc-500">Closed</p>
+              </div>
+            </div>
+
             <section className="mb-8 rounded-lg border border-black/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-zinc-950">
               <h2 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
                 Start a new incident
@@ -108,12 +127,14 @@ export default async function Home() {
               {incidents.length === 0 ? (
                 <p className="text-sm text-zinc-500">No incidents yet.</p>
               ) : (
-                <ul className="divide-y divide-black/10 rounded-lg border border-black/10 bg-white shadow-sm dark:divide-white/10 dark:border-white/10 dark:bg-zinc-950">
+                <ul className="space-y-2">
                   {incidents.map((incident) => (
                     <li key={incident.id}>
                       <Link
                         href={`/incidents/${incident.id}`}
-                        className="flex items-center justify-between px-4 py-3 hover:bg-black/[.03] dark:hover:bg-white/[.04]"
+                        className={`flex items-center justify-between rounded-lg border border-l-4 border-black/10 bg-white px-4 py-3 shadow-sm hover:bg-black/[.03] dark:border-white/10 dark:bg-zinc-950 dark:hover:bg-white/[.04] ${
+                          incident.status === "active" ? "border-l-[#00274c]" : "border-l-zinc-300 dark:border-l-zinc-700"
+                        }`}
                       >
                         <div>
                           <p className="text-sm font-medium text-black dark:text-zinc-50">

@@ -54,15 +54,16 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
+    <div className="flex min-h-screen items-center justify-center bg-[#00274c] px-4 py-12">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm space-y-4 rounded-lg border border-black/10 bg-white p-8 dark:border-white/10 dark:bg-zinc-950"
+        className="w-full max-w-sm space-y-4 rounded-xl border border-black/10 bg-white p-8 shadow-xl dark:border-white/10 dark:bg-zinc-950"
       >
         <div className="flex flex-col items-center gap-3 text-center">
           <div className="rounded-xl bg-white p-2">
             <Image src="/logo.png" alt="Emergency Preparedness Solutions" width={72} height={74} priority />
           </div>
+          <div className="h-1 w-10 rounded-full bg-[#FFCB05]" />
           <div>
             <h1 className="text-xl font-semibold text-black dark:text-zinc-50">MEDICS</h1>
             <p className="text-sm text-zinc-500">Managed Emergency Decisions Incident Command System</p>

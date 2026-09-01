@@ -33,8 +33,8 @@ export default function ForgotPasswordPage() {
 
   if (sent) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50 p-8 dark:bg-black">
-        <div className="w-full max-w-sm space-y-3 rounded-lg border border-black/10 bg-white p-8 text-center dark:border-white/10 dark:bg-zinc-950">
+      <div className="flex min-h-screen items-center justify-center bg-[#00274c] p-8">
+        <div className="w-full max-w-sm space-y-3 rounded-xl border border-black/10 bg-white p-8 text-center shadow-xl dark:border-white/10 dark:bg-zinc-950">
           <h1 className="text-xl font-semibold text-black dark:text-zinc-50">Check your email</h1>
           <p className="text-sm text-zinc-500">
             If an account exists for <span className="font-medium">{email}</span>, we&apos;ve sent a
@@ -49,10 +49,10 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
+    <div className="flex min-h-screen items-center justify-center bg-[#00274c] px-4 py-12">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm space-y-4 rounded-lg border border-black/10 bg-white p-8 dark:border-white/10 dark:bg-zinc-950"
+        className="w-full max-w-sm space-y-4 rounded-xl border border-black/10 bg-white p-8 shadow-xl dark:border-white/10 dark:bg-zinc-950"
       >
         <div>
           <h1 className="text-xl font-semibold text-black dark:text-zinc-50">Reset your password</h1>
