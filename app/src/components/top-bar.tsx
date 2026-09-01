@@ -22,8 +22,8 @@ export function TopBar({
     <header className="bg-[#00274c] px-6 py-4 print:hidden">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <div className="flex min-w-0 items-center gap-3">
-          <Link href="/" className="shrink-0 rounded-lg bg-white p-1">
-            <Image src="/logo.png" alt="" width={32} height={33} />
+          <Link href="/" className="shrink-0 rounded-lg">
+            <Image src="/icon-mark.png" alt="" width={36} height={36} />
           </Link>
           <div className="min-w-0">
             {backHref && (
