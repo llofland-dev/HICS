@@ -78,7 +78,7 @@ export default function SignUpPage() {
       >
         <div className="flex flex-col items-center gap-3 text-center">
           <div className="rounded-xl bg-white p-2">
-            <Image src="/logo.png" alt="Emergency Preparedness Solutions" width={72} height={74} />
+            <Image src="/logo.png" alt="Emergency Preparedness Solutions" width={72} height={74} priority />
           </div>
           <div>
             <h1 className="text-xl font-semibold text-black dark:text-zinc-50">Create account</h1>

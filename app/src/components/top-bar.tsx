@@ -23,7 +23,7 @@ export function TopBar({
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <div className="flex min-w-0 items-center gap-3">
           <Link href="/" className="shrink-0 rounded-lg">
-            <Image src="/icon-mark.png" alt="" width={36} height={36} />
+            <Image src="/icon-mark.png" alt="" width={36} height={36} priority />
           </Link>
           <div className="min-w-0">
             {backHref && (
