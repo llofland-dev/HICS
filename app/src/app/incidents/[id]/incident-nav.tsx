@@ -14,6 +14,7 @@ function sections(incidentId: string) {
     { href: `/incidents/${incidentId}/unit-logs`, label: "HICS 214" },
     { href: `/incidents/${incidentId}/ics215a`, label: "HICS 215A" },
     { href: `/incidents/${incidentId}/aar`, label: "AAR" },
+    { href: `/incidents/${incidentId}/other-forms`, label: "Other Forms" },
     { href: `/incidents/${incidentId}/import-playbook`, label: "Import from Playbook" },
   ];
 }

@@ -134,6 +134,16 @@ export interface UnitLogEntry {
   created_at: string;
 }
 
+export interface OtherFormSubmission {
+  id: string;
+  incident_id: string;
+  form_code: string;
+  data: Record<string, unknown>;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export type CoreElement =
   | "Communications"
   | "Resources and Assets"
