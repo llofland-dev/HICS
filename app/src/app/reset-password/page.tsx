@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { BRAND } from "@/lib/brand";
 
-// Reached via the link in the password-reset email. The Supabase browser
-// client detects the recovery token in the URL on load and exchanges it for
-// a real session automatically (same mechanism as normal sign-in) — by the
-// time this component's handlers run, `updateUser` below has a valid
-// session to act on with no extra wiring needed here.
+// Reached via the link in the password-reset email. Supabase's GoTrue can
+// issue recovery links in either shape depending on project config: a
+// `?code=` query param (PKCE) or access_token/refresh_token in the URL
+// *hash* fragment (implicit flow) — @supabase/ssr's browser client doesn't
+// auto-detect the hash-fragment shape, so `updateUser` below would
+// otherwise fail with "Auth session missing!" if that's what shows up.
+// Establish the session ourselves on mount, handling both shapes.
 export default function ResetPasswordPage() {
   const supabase = createClient();
 
@@ -18,6 +20,25 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const code = new URLSearchParams(window.location.search).get("code");
+    const hashParams = new URLSearchParams(window.location.hash.slice(1));
+    const accessToken = hashParams.get("access_token");
+    const refreshToken = hashParams.get("refresh_token");
+
+    const establishSession = code
+      ? supabase.auth.exchangeCodeForSession(code)
+      : accessToken && refreshToken
+        ? supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
+        : Promise.resolve({ error: hashParams.get("error") ? new Error("expired") : null });
+
+    establishSession.then(({ error }) => {
+      if (error) setError("This reset link is invalid or has expired. Request a new one.");
+      setReady(true);
+    });
+  }, [supabase]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -96,8 +117,8 @@ export default function ResetPasswordPage() {
 
         {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
-        <button type="submit" disabled={loading} className={`w-full ${BRAND.buttonClass}`}>
-          {loading ? "Updating..." : "Update password"}
+        <button type="submit" disabled={loading || !ready} className={`w-full ${BRAND.buttonClass}`}>
+          {!ready ? "Verifying link..." : loading ? "Updating..." : "Update password"}
         </button>
       </form>
     </div>
