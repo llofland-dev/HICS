@@ -26,7 +26,7 @@ const byKey = new Map(PALETTE.map((c) => [c.key, c]));
 // grow more sub-groups (e.g. Role Responsibilities) alongside it.
 export const CATEGORIES: CategoryDef[] = [
   { key: "codes", label: "Codes", icon: AlertIcon, color: byKey.get("red")! },
-  { key: "hics", label: "HICS", icon: SitemapIcon, color: byKey.get("blue")!, requiresAdminTier: true },
+  { key: "hics", label: "Incident Command", icon: SitemapIcon, color: byKey.get("blue")!, requiresAdminTier: true },
   { key: "pots", label: "POTS", icon: PhoneIcon, color: byKey.get("teal")! },
 ];
 

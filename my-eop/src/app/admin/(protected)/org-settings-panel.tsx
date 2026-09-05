@@ -270,9 +270,9 @@ export function OrgSettingsPanel({ org }: { org: Organization }) {
         <h3 className="mb-1 text-sm font-medium text-zinc-600 dark:text-zinc-400">Facility Admin passphrase</h3>
         <p className="mb-3 text-sm text-zinc-500">
           A separate, elevated passphrase for whoever you designate as your facility&apos;s on-the-ground
-          admin (e.g. your Emergency Manager). Entering it at the plan code screen unlocks HICS/Job
-          Action Sheet content and the ability to update contact phone numbers and emails — nothing
-          else. No account or login required, same as the staff password above.
+          admin (e.g. your Emergency Manager). Entering it at the plan code screen unlocks Incident
+          Command/Job Action Sheet content and the ability to update contact phone numbers and
+          emails — nothing else. No account or login required, same as the staff password above.
         </p>
         <form onSubmit={handleSetAdminPassword} className="flex flex-wrap items-end gap-3">
           <div className="flex-1 space-y-1">
